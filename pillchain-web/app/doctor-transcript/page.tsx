@@ -930,35 +930,41 @@ export default function MedicalPrescription() {
     const initContract = async () => {
       try {
         if (!window.ethereum) {
-          setError("Por favor, instale MetaMask para usar esta aplicação.")
-          return
+          setError("Por favor, instale MetaMask para usar esta aplicação.");
+          return;
         }
-
-        await window.ethereum.request({ method: "eth_requestAccounts" })
-
+    
+        await window.ethereum.request({ method: "eth_requestAccounts" });
+    
         // Criando provedor e assinante (signer) com ethers v6
-        const provider = new ethers.BrowserProvider(window.ethereum)
-        const signer = await provider.getSigner()
-        const address = await signer.getAddress()
-        setAccount(address)
-
+        const provider = new ethers.BrowserProvider(window.ethereum);
+        const signer = await provider.getSigner();
+        const address = await signer.getAddress();
+        setAccount(address);
+    
         // Criando instância do contrato
-        const contractInstance = new ethers.Contract(contractAddress, contractABI, signer)
-        setContract(contractInstance)
-
-        // Verificando se o usuário tem o papel de médico
-        const doctorRole = await contractInstance.DOCTOR_ROLE()
-        const hasDocRole = await contractInstance.hasRole(doctorRole, address)
-        setIsDoctor(hasDocRole)
-
-        if (!hasDocRole) {
-          setError("Você não tem permissão de médico no contrato. Algumas funções estarão indisponíveis.")
+        const contractInstance = new ethers.Contract(contractAddress, contractABI, signer);
+        setContract(contractInstance);
+    
+        try {
+          // Verificando se o usuário tem o papel de médico
+          const doctorRole = await contractInstance.DOCTOR_ROLE();
+          const hasDocRole = await contractInstance.hasRole(doctorRole, address);
+          setIsDoctor(hasDocRole);
+    
+          if (!hasDocRole) {
+            setError("Você não tem permissão de médico no contrato. Algumas funções estarão indisponíveis.");
+          }
+        } catch (roleError) {
+          console.error("Erro ao verificar cargo de médico:", roleError);
+          setError("Erro ao verificar permissões.");
         }
       } catch (err) {
-        console.error("Erro ao inicializar contrato:", err)
-        setError("Falha ao conectar com a blockchain. Verifique sua carteira.")
+        console.error("Erro ao inicializar contrato:", err);
+        setError("Falha ao conectar com a blockchain. Verifique sua conexão.");
       }
-    }
+    };
+    
 
     initContract()
 
