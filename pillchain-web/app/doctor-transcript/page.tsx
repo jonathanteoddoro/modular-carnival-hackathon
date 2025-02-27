@@ -2,7 +2,7 @@
 import Header from "@/components/Header"
 import TextField from "@mui/material/TextField"
 import { useState, useEffect } from "react"
-import { Check } from "lucide-react"
+import { Check, Trash2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { ethers } from "ethers"
@@ -986,6 +986,11 @@ export default function MedicalPrescription() {
     setMedications(newMedications)
   }
 
+  const handleDeleteMedication = (index: number) => {
+    const newMedications = medications.filter((_, i) => i !== index)
+    setMedications(newMedications)
+  }
+
   const issuePrescription = async () => {
     if (!ethers.isAddress(patientCard)) {
       setError("Endereço da carteira do paciente inválido")
@@ -1077,8 +1082,10 @@ export default function MedicalPrescription() {
                   className="bg-gray-50"
                 />
 
+                <div className="h-4"></div> {/* Small space between patient wallet input and medication selection */}
+
                 {medications.map((med, index) => (
-                  <div key={index} className="space-y-4 p-4 border border-gray-100 rounded-lg bg-gray-50">
+                  <div key={index} className="space-y-4 p-4 border border-gray-100 rounded-lg bg-gray-50 relative">
                     <p className="text-sm font-medium text-gray-500">Medicamento {index + 1}</p>
                     <Select value={med.medication} onValueChange={(value) => handleMedicationChange(index, value)}>
                       <SelectTrigger className="border-gray-200 bg-white shadow-sm">
@@ -1086,8 +1093,16 @@ export default function MedicalPrescription() {
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="-Medicamento-">---</SelectItem>
+                        <SelectItem value="AMOXICILINA">AMOXICILINA</SelectItem>
+                        <SelectItem value="DIAZEPAM">DIAZEPAM</SelectItem>
                         <SelectItem value="RITALINA">RITALINA</SelectItem>
-                        <SelectItem value="Para ce ta mal">Para ce ta mal</SelectItem>
+                        <SelectItem value="MORFINA">MORFINA</SelectItem>
+                        <SelectItem value="OXICODONA">OXICODONA</SelectItem>
+                        <SelectItem value="CLONAZEPAM">CLONAZEPAM</SelectItem>
+                        <SelectItem value="METFORMINA">METFORMINA</SelectItem>
+                        <SelectItem value="LOSARTANA">LOSARTANA</SelectItem>
+                        <SelectItem value="SERTRALINA">SERTRALINA</SelectItem>
+
                       </SelectContent>
                     </Select>
 
@@ -1101,6 +1116,16 @@ export default function MedicalPrescription() {
                       variant="outlined"
                       className="bg-white"
                     />
+
+                    {index > 0 && (
+                      <button
+                        type="button"
+                        onClick={() => handleDeleteMedication(index)}
+                        className="absolute top-2 right-2 text-red-500 hover:text-red-700"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </button>
+                    )}
                   </div>
                 ))}
 
