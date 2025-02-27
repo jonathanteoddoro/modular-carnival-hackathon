@@ -1,24 +1,73 @@
-// pages/add-medication.tsx
-"use client"
+"use client";
+
 import Header from "@/components/Header";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { BrowserProvider, Contract } from "ethers";
+import { Dropdown } from "@/components/ui/dropdown";
+import { contractABI, contractAddress } from "@/app/contract";
+
+// Declarando a interface global para window.ethereum
+declare global {
+  interface Window {
+    ethereum?: any;
+  }
+}
 
 export default function AddMedication() {
   const router = useRouter();
   const [medicationName, setMedicationName] = useState("");
   const [description, setDescription] = useState("");
-  const [dose, setDose] = useState("");
-  const [price, setPrice] = useState("");
+  const [lote, setLote] = useState("");
+  const [validity, setValidity] = useState("");
+  const [prescriptionRequired, setPrescriptionRequired] = useState("false");
+  const [provider, setProvider] = useState<BrowserProvider | null>(null);
+  const [signer, setSigner] = useState<any>(null);
+  const [contract, setContract] = useState<Contract | null>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  useEffect(() => {
+    const loadBlockchainData = async () => {
+      if (typeof window !== "undefined" && window.ethereum) {
+        try {
+          const web3Provider = new BrowserProvider(window.ethereum);
+          const web3Signer = await web3Provider.getSigner();
+          const web3Contract = new Contract(contractAddress, contractABI, web3Signer);
+          
+          setProvider(web3Provider);
+          setSigner(web3Signer);
+          setContract(web3Contract);
+        } catch (error) {
+          console.error("Erro ao conectar com o contrato:", error);
+        }
+      } else {
+        console.error("MetaMask não detectado!");
+      }
+    };
+
+    loadBlockchainData();
+  }, []);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Aqui você pode adicionar a lógica para enviar os dados do medicamento
-    console.log({ medicationName, description, dose, price });
-    router.push("/"); // Redireciona para a página inicial após o envio
+    const timestampValidity = Math.floor(new Date(validity).getTime() / 1000); // Converte para timestamp Unix
+
+    try {
+      if (!contract) {
+        alert("Contrato não carregado corretamente");
+        return;
+      }
+
+      const tx = await contract.mintMedicine(medicationName, lote, timestampValidity, prescriptionRequired === "true");
+      await tx.wait();
+      alert("Medicamento criado na blockchain!");
+
+    } catch (error) {
+      console.error("Erro ao criar medicamento na blockchain:", error);
+      alert("Erro ao criar medicamento.");
+    }
   };
 
   return (
@@ -42,20 +91,26 @@ export default function AddMedication() {
           />
           <Input
             type="text"
-            placeholder="Dose recomendada"
-            value={dose}
-            onChange={(e) => setDose(e.target.value)}
+            placeholder="Lote do Medicamento"
+            value={lote}
+            onChange={(e) => setLote(e.target.value)}
             required
           />
           <Input
-            type="number"
-            placeholder="Preço do Medicamento"
-            value={price}
-            onChange={(e) => setPrice(e.target.value)}
+            type="date"
+            placeholder="Data de Validade"
+            value={validity}
+            onChange={(e) => setValidity(e.target.value)}
             required
           />
+          <Dropdown
+            value={prescriptionRequired}
+            onChange={(e) => setPrescriptionRequired(e.target.value)}
+            required
+            options={["true", "false"]}
+          />
           <Button type="submit" variant="outline" className="w-full mt-4">
-            Adicionar Medicamento
+            Adicionar Medicamento na Blockchain
           </Button>
         </form>
         <Button variant="outline" onClick={() => router.push("/")} className="w-full mt-4">
