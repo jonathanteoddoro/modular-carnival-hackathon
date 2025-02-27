@@ -1,6 +1,5 @@
 "use client"
 import TextField from '@mui/material/TextField'
-import { Check } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import Image from "next/image"
 
@@ -27,7 +26,6 @@ export default function LoginDrugstore() {
               </div>
               <div className="pt-4 flex justify-center">
                 <Button className="bg-[#D5A021] text-white rounded-md py-3 px-6 flex items-center justify-center gap-2">
-                  <Check size={18} />
                   Fazer Login
                 </Button>
               </div>
