@@ -26,14 +26,9 @@ export default function Drugstore() {
               <TextField label="Id Remédio" variant="outlined" size="medium" fullWidth />
             </div>
 
-            {/* Pharmacy wallet field */}
-            <div className="space-y-1">
-              <TextField label="Quantidade" variant="outlined" size="medium" fullWidth />
-            </div>
-
             {/* Quantity field */}
             <div className="space-y-1">
-              <TextField label="Código da receita" variant="outlined" size="medium" fullWidth />
+              <TextField label="Id do Cliente" variant="outlined" size="medium" fullWidth />
             </div>
 
             {/* Submit button */}
