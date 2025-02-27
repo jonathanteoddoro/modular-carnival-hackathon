@@ -932,71 +932,78 @@ export default function Supplier() {
   const [isLoading, setIsLoading] = useState(false)
 
   // Handle form submission
-  const handleSubmit = async (e) => {
-    e.preventDefault()
-    setIsLoading(true)
-    setStatus({ type: "", message: "" })
+interface Status {
+	type: string;
+	message: string;
+}
 
-    if (!medicineName || !batchNumber || !expirationDate || !pharmacyAddress || !quantity) {
-      setStatus({ type: "error", message: "Todos os campos são obrigatórios." })
-      setIsLoading(false)
-      return
-    }
+interface FormEvent extends React.FormEvent<HTMLFormElement> {}
 
-    try {
-      // Convert date string to Unix timestamp (seconds)
-      const expDate = Math.floor(new Date(expirationDate).getTime() / 1000)
-      const quantityNum = parseInt(quantity)
+const handleSubmit = async (e: FormEvent) => {
+	e.preventDefault();
+	setIsLoading(true);
+	setStatus({ type: "", message: "" });
 
-      // Check if Ethereum is available
-      if (typeof window.ethereum === 'undefined') {
-        throw new Error("Por favor, instale a MetaMask!")
-      }
+	if (!medicineName || !batchNumber || !expirationDate || !pharmacyAddress || !quantity) {
+		setStatus({ type: "error", message: "Todos os campos são obrigatórios." });
+		setIsLoading(false);
+		return;
+	}
 
-      // Request account access
-      await window.ethereum.request({ method: 'eth_requestAccounts' })
-      
-      // Instanciar o provider corretamente para ethers v6
-      const provider = new ethers.BrowserProvider(window.ethereum)
-      const signer = await provider.getSigner()
-      
-      // Criar instância do contrato
-      const contract = new ethers.Contract(contractAddress, contractABI, signer)
-      
-      // Chamar função batchMintMedicine
-      const tx = await contract.batchMintMedicine(
-        medicineName,
-        batchNumber,
-        expDate,
-        pharmacyAddress,
-        quantityNum
-      )
-      
-      // Esperar a transação ser confirmada
-      await tx.wait()
-      
-      setStatus({ 
-        type: "success", 
-        message: `Sucesso! ${quantity} unidades de ${medicineName} geradas para a farmácia.` 
-      })
-      
-      // Reset form
-      setMedicineName("")
-      setBatchNumber("")
-      setExpirationDate("")
-      setPharmacyAddress("")
-      setQuantity("")
-      
-    } catch (error) {
-      console.error("Transaction error:", error)
-      setStatus({ 
-        type: "error", 
-        message: `Erro: ${error.message || "Falha na transação. Verifique se você tem o papel MANUFACTURER_ROLE."}` 
-      })
-    } finally {
-      setIsLoading(false)
-    }
-  }
+	try {
+		// Convert date string to Unix timestamp (seconds)
+		const expDate = Math.floor(new Date(expirationDate).getTime() / 1000);
+		const quantityNum = parseInt(quantity);
+
+		// Check if Ethereum is available
+		if (typeof window.ethereum === 'undefined') {
+			throw new Error("Por favor, instale a MetaMask!");
+		}
+
+		// Request account access
+		await window.ethereum.request({ method: 'eth_requestAccounts' });
+
+		// Instanciar o provider corretamente para ethers v6
+		const provider = new ethers.BrowserProvider(window.ethereum);
+		const signer = await provider.getSigner();
+
+		// Criar instância do contrato
+		const contract = new ethers.Contract(contractAddress, contractABI, signer);
+
+		// Chamar função batchMintMedicine
+		const tx = await contract.batchMintMedicine(
+			medicineName,
+			batchNumber,
+			expDate,
+			pharmacyAddress,
+			quantityNum
+		);
+
+		// Esperar a transação ser confirmada
+		await tx.wait();
+
+		setStatus({
+			type: "success",
+			message: `Sucesso! ${quantity} unidades de ${medicineName} geradas para a farmácia.`
+		});
+
+		// Reset form
+		setMedicineName("");
+		setBatchNumber("");
+		setExpirationDate("");
+		setPharmacyAddress("");
+		setQuantity("");
+
+	} catch (error) {
+		console.error("Transaction error:", error);
+		setStatus({
+			type: "error",
+			message: `Erro: ${(error as any).message || "Falha na transação. Verifique se você tem o papel MANUFACTURER_ROLE."}`
+		});
+	} finally {
+		setIsLoading(false);
+	}
+};
 
   return (
     <div className="min-h-screen bg-white flex flex-col">
@@ -1016,50 +1023,60 @@ export default function Supplier() {
           )}
 
           <form className="space-y-4" onSubmit={handleSubmit}>
-            <TextField 
-              label="Tipo do Remédio" 
-              variant="outlined" 
-              size="medium" 
-              fullWidth 
-              value={medicineName}
-              onChange={(e) => setMedicineName(e.target.value)}
-            />
-            <TextField 
-              label="N° Lote" 
-              variant="outlined" 
-              size="medium" 
-              fullWidth 
-              value={batchNumber}
-              onChange={(e) => setBatchNumber(e.target.value)}
-            />
-            <TextField 
-              label="Data Validade" 
-              variant="outlined" 
-              size="medium" 
-              fullWidth 
-              type="date"
-              InputLabelProps={{ shrink: true }}
-              value={expirationDate}
-              onChange={(e) => setExpirationDate(e.target.value)}
-            />
-            <TextField 
-              label="Farmácia Destino" 
-              variant="outlined" 
-              size="medium" 
-              fullWidth 
-              placeholder="0x..."
-              value={pharmacyAddress}
-              onChange={(e) => setPharmacyAddress(e.target.value)}
-            />
-            <TextField 
-              label="Quantidade" 
-              variant="outlined" 
-              size="medium" 
-              fullWidth 
-              type="number"
-              value={quantity}
-              onChange={(e) => setQuantity(e.target.value)}
-            />
+            <div className="space-y-4">
+              <TextField 
+                label="Tipo do Remédio" 
+                variant="outlined" 
+                size="medium" 
+                fullWidth 
+                value={medicineName}
+                onChange={(e) => setMedicineName(e.target.value)}
+              />
+            </div>
+            <div className="space-y-4">
+              <TextField 
+                label="N° Lote" 
+                variant="outlined" 
+                size="medium" 
+                fullWidth 
+                value={batchNumber}
+                onChange={(e) => setBatchNumber(e.target.value)}
+              />
+            </div>
+            <div className="space-y-4">
+              <TextField 
+                label="Data Validade" 
+                variant="outlined" 
+                size="medium" 
+                fullWidth 
+                type="date"
+                InputLabelProps={{ shrink: true }}
+                value={expirationDate}
+                onChange={(e) => setExpirationDate(e.target.value)}
+              />
+            </div>
+            <div className="space-y-4">
+              <TextField 
+                label="Farmácia Destino" 
+                variant="outlined" 
+                size="medium" 
+                fullWidth 
+                placeholder="0x..."
+                value={pharmacyAddress}
+                onChange={(e) => setPharmacyAddress(e.target.value)}
+              />
+            </div>
+            <div className="space-y-4">
+              <TextField 
+                label="Quantidade" 
+                variant="outlined" 
+                size="medium" 
+                fullWidth 
+                type="number"
+                value={quantity}
+                onChange={(e) => setQuantity(e.target.value)}
+              />
+            </div>
 
             <div className="pt-4 flex justify-center">
               <button
