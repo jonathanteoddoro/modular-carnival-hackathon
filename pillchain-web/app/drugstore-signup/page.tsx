@@ -1,6 +1,5 @@
 "use client"
 import TextField from '@mui/material/TextField'
-import { Check } from "lucide-react"
 import Image from 'next/image'
 
 export default function DoctorSignup() {
@@ -32,7 +31,6 @@ export default function DoctorSignup() {
               </div>
               <div className="pt-4 flex justify-center">
                 <button type="submit" className="bg-[#D5A021] text-white rounded-md py-3 px-6 flex items-center justify-center gap-2">
-                  <Check size={18} />
                   Cadastrar
                 </button>
               </div>
