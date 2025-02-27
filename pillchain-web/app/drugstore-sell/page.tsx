@@ -6,7 +6,7 @@ import TextField from "@mui/material/TextField";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 
-export default function Drugstore() {
+export default function DrugstoreSell() {
   const router = useRouter();
 
   return (

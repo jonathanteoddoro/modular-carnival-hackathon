@@ -1,41 +1,35 @@
 "use client"
 import Header from "@/components/Header"
 import TextField from '@mui/material/TextField'
-
 import { useState } from "react"
 import { Check } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
+interface Medication {
+  medication: string;
+  instructions: string;
+}
+
 export default function MedicalPrescription() {
   const [patientCard, setPatientCard] = useState("")
-  const [medications, setMedications] = useState([{ medication: "-Medicamento-", instructions: "Instruções de uso." }])
+  const [medications, setMedications] = useState<Medication[]>([{ medication: "-Medicamento-", instructions: "Instruções de uso." }])
 
   const handleAddMedication = () => {
     setMedications([...medications, { medication: "-Medicamento-", instructions: "" }])
   }
 
-interface Medication {
-    medication: string;
-    instructions: string;
-}
+  const handleMedicationChange = (index: number, value: string) => {
+    const newMedications = [...medications]
+    newMedications[index].medication = value
+    setMedications(newMedications)
+  }
 
-const handleMedicationChange = (index: number, value: string) => {
-    const newMedications: Medication[] = [...medications];
-    newMedications[index].medication = value;
-    setMedications(newMedications);
-}
-
-interface Medication {
-    medication: string;
-    instructions: string;
-}
-
-const handleInstructionsChange = (index: number, value: string) => {
-    const newMedications: Medication[] = [...medications]
+  const handleInstructionsChange = (index: number, value: string) => {
+    const newMedications = [...medications]
     newMedications[index].instructions = value
     setMedications(newMedications)
-}
+  }
 
   return (
     <div className="min-h-screen flex flex-col">
