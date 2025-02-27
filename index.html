@@ -1,16 +1,64 @@
-"use client"
-import Header from "@/components/Header"
-import TextField from '@mui/material/TextField'
-import { useState, useEffect } from "react"
-import { Check } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { ethers } from "ethers"
-import { Alert, AlertDescription } from "@/components/ui/alert"
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MedicineTracker DApp</title>
+    <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+</head>
+<body>
+    <h2>MedicineTracker DApp</h2>
 
-// Endereço do contrato
-const contractAddress = "0x25b594824a71a093beaCC5Cc786281d4441912e5"
-const contractABI = [
+    <button onclick="connectWallet()">🔗 Connect Wallet</button>
+    <p><strong>Connected Address:</strong> <span id="walletAddress">Not connected</span></p>
+
+    <h3>Assign Roles</h3>
+    <input type="text" id="roleAddress" placeholder="Address">
+    <select id="roleType">
+        <option value="MANUFACTURER_ROLE">Manufacturer</option>
+        <option value="DISTRIBUTOR_ROLE">Distributor</option>
+        <option value="PHARMACY_ROLE">Pharmacy</option>
+        <option value="DOCTOR_ROLE">Doctor</option>
+    </select>
+    <button onclick="grantRole()">Grant Role</button>
+
+    <h3>Mint Medicine</h3>
+    <input type="text" id="medName" placeholder="Medicine Name">
+    <input type="text" id="batchNumber" placeholder="Batch Number">
+    <input type="number" id="expDate" placeholder="Expiration (timestamp)">
+    <button onclick="mintMedicine()">Mint</button>
+
+    <h3>Transfer Medicine</h3>
+    <input type="number" id="transferTokenId" placeholder="Token ID">
+    <input type="text" id="transferTo" placeholder="Receiver Address">
+    <button onclick="transferMedicine()">Transfer</button>
+
+    <h3>Issue Prescription</h3>
+    <input type="text" id="prescMedicineName" placeholder="Medicine Name">
+    <input type="text" id="prescPatient" placeholder="Patient Address">
+    <button onclick="issuePrescription()">Issue Prescription</button>
+
+    <h3>Sell Medicine</h3>
+    <input type="number" id="sellTokenId" placeholder="Token ID">
+    <input type="text" id="sellToPatient" placeholder="Patient Address">
+    <button onclick="sellMedicine()">Sell</button>
+
+    <h3>Get Medicine Info</h3>
+    <input type="number" id="queryTokenId" placeholder="Token ID">
+    <button onclick="getMedicineInfo()">Query</button>
+    <pre id="medicineInfo"></pre>
+
+    <h3>Get Prescription</h3>
+    <input type="text" id="queryPatient" placeholder="Patient Address">
+    <button onclick="getPrescription()">Query</button>
+    <pre id="prescriptionInfo"></pre>
+
+    <script>
+        let provider;
+        let signer;
+        let contract;
+
+        const ABI = [
 	{
 		"inputs": [],
 		"stateMutability": "nonpayable",
@@ -36,6 +84,24 @@ const contractABI = [
 		],
 		"name": "AccessControlUnauthorizedAccount",
 		"type": "error"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "to",
+				"type": "address"
+			},
+			{
+				"internalType": "uint256",
+				"name": "tokenId",
+				"type": "uint256"
+			}
+		],
+		"name": "approve",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
 	},
 	{
 		"inputs": [
@@ -193,57 +259,6 @@ const contractABI = [
 	{
 		"inputs": [
 			{
-				"internalType": "address",
-				"name": "to",
-				"type": "address"
-			},
-			{
-				"internalType": "uint256",
-				"name": "tokenId",
-				"type": "uint256"
-			}
-		],
-		"name": "approve",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "string",
-				"name": "_name",
-				"type": "string"
-			},
-			{
-				"internalType": "string",
-				"name": "_batchNumber",
-				"type": "string"
-			},
-			{
-				"internalType": "uint256",
-				"name": "_expirationDate",
-				"type": "uint256"
-			},
-			{
-				"internalType": "address",
-				"name": "_pharmacy",
-				"type": "address"
-			},
-			{
-				"internalType": "uint256",
-				"name": "_quantity",
-				"type": "uint256"
-			}
-		],
-		"name": "batchMintMedicine",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
 				"internalType": "bytes32",
 				"name": "role",
 				"type": "bytes32"
@@ -303,12 +318,6 @@ const contractABI = [
 				"internalType": "address",
 				"name": "manufacturer",
 				"type": "address"
-			},
-			{
-				"indexed": true,
-				"internalType": "address",
-				"name": "pharmacy",
-				"type": "address"
 			}
 		],
 		"name": "MedicineMinted",
@@ -338,6 +347,54 @@ const contractABI = [
 		],
 		"name": "MedicineSold",
 		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": true,
+				"internalType": "uint256",
+				"name": "tokenId",
+				"type": "uint256"
+			},
+			{
+				"indexed": true,
+				"internalType": "address",
+				"name": "from",
+				"type": "address"
+			},
+			{
+				"indexed": true,
+				"internalType": "address",
+				"name": "to",
+				"type": "address"
+			}
+		],
+		"name": "MedicineTransferred",
+		"type": "event"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "string",
+				"name": "_name",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "_batchNumber",
+				"type": "string"
+			},
+			{
+				"internalType": "uint256",
+				"name": "_expirationDate",
+				"type": "uint256"
+			}
+		],
+		"name": "mintMedicine",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
 	},
 	{
 		"anonymous": false,
@@ -613,6 +670,24 @@ const contractABI = [
 	{
 		"inputs": [
 			{
+				"internalType": "uint256",
+				"name": "_tokenId",
+				"type": "uint256"
+			},
+			{
+				"internalType": "address",
+				"name": "_to",
+				"type": "address"
+			}
+		],
+		"name": "transferMedicine",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
 				"internalType": "address",
 				"name": "owner",
 				"type": "address"
@@ -632,6 +707,19 @@ const contractABI = [
 	{
 		"inputs": [],
 		"name": "DEFAULT_ADMIN_ROLE",
+		"outputs": [
+			{
+				"internalType": "bytes32",
+				"name": "",
+				"type": "bytes32"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "DISTRIBUTOR_ROLE",
 		"outputs": [
 			{
 				"internalType": "bytes32",
@@ -780,6 +868,11 @@ const contractABI = [
 				"type": "uint256"
 			},
 			{
+				"internalType": "address",
+				"name": "currentHolder",
+				"type": "address"
+			},
+			{
 				"internalType": "bool",
 				"name": "isSold",
 				"type": "bool"
@@ -913,200 +1006,196 @@ const contractABI = [
 		"stateMutability": "view",
 		"type": "function"
 	}
-]
+];
 
-export default function MedicalPrescription() {
-  const [patientCard, setPatientCard] = useState("")
-  const [medications, setMedications] = useState([{ medication: "-Medicamento-", instructions: "Instruções de uso." }])
-  const [contract, setContract] = useState<ethers.Contract | null>(null)
-  const [account, setAccount] = useState("")
-  const [isDoctor, setIsDoctor] = useState(false)
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState("")
-  const [success, setSuccess] = useState("")
-  const [patientName, setPatientName] = useState("Fulano de tal Scarpelano, 18 anos")
+        const CONTRACT_ADDRESS = '0x05A8f1a276008c967Adb9ad4bDB6804f30cC5Ab3';
 
-  useEffect(() => {
-    const initContract = async () => {
-      try {
-        if (!window.ethereum) {
-          setError("Por favor, instale MetaMask para usar esta aplicação.")
-          return
+        async function connectWallet() {
+            if (window.ethereum) {
+                try {
+                    provider = new ethers.providers.Web3Provider(window.ethereum);
+                    await provider.send("eth_requestAccounts", []);
+                    signer = provider.getSigner();
+                    const address = await signer.getAddress();
+                    document.getElementById("walletAddress").innerText = address;
+                    contract = new ethers.Contract(CONTRACT_ADDRESS, ABI, signer);
+                    alert("Wallet connected!");
+                } catch (error) {
+                    console.error("Error connecting to wallet:", error);
+                    alert("Error connecting to wallet: " + error.message);
+                }
+            } else {
+                alert("Please install MetaMask.");
+            }
         }
 
-        await window.ethereum.request({ method: 'eth_requestAccounts' })
-
-        // Criando provedor e assinante (signer) com ethers v6
-        const provider = new ethers.BrowserProvider(window.ethereum)
-        const signer = await provider.getSigner()
-        const address = await signer.getAddress()
-        setAccount(address)
-
-        // Criando instância do contrato
-        const contractInstance = new ethers.Contract(contractAddress, contractABI, signer)
-        setContract(contractInstance)
-
-        // Verificando se o usuário tem o papel de médico
-        const doctorRole = await contractInstance.DOCTOR_ROLE()
-        const hasDocRole = await contractInstance.hasRole(doctorRole, address)
-        setIsDoctor(hasDocRole)
-
-        if (!hasDocRole) {
-          setError("Você não tem permissão de médico no contrato. Algumas funções estarão indisponíveis.")
+        async function grantRole() {
+            if (!contract) {
+                alert("Please connect your wallet first!");
+                return;
+            }
+            
+            const roleType = document.getElementById("roleType").value;
+            const role = ethers.utils.keccak256(ethers.utils.toUtf8Bytes(roleType));
+            const address = document.getElementById("roleAddress").value;
+            
+            if (!ethers.utils.isAddress(address)) {
+                alert("Invalid address format");
+                return;
+            }
+            
+            try {
+                const tx = await contract.grantRole(role, address);
+                await tx.wait();
+                alert(`Role ${roleType} granted to ${address}`);
+            } catch (error) {
+                console.error("Error granting role:", error);
+                alert("Error granting role: " + error.message);
+            }
         }
-      } catch (err) {
-        console.error("Erro ao inicializar contrato:", err)
-        setError("Falha ao conectar com a blockchain. Verifique sua carteira.")
-      }
-    }
 
-    initContract()
+        async function mintMedicine() {
+            if (!contract) {
+                alert("Please connect your wallet first!");
+                return;
+            }
+            
+            const name = document.getElementById("medName").value;
+            const batchNumber = document.getElementById("batchNumber").value;
+            const expirationDate = document.getElementById("expDate").value;
+            
+            if (!name || !batchNumber || !expirationDate) {
+                alert("Please fill in all required fields");
+                return;
+            }
 
-    // Listener para mudança de conta no MetaMask
-    window.ethereum?.on('accountsChanged', () => window.location.reload())
-
-    return () => {
-      window.ethereum?.removeListener('accountsChanged', () => {})
-    }
-  }, [])
-
-  const handleAddMedication = () => {
-    setMedications([...medications, { medication: "-Medicamento-", instructions: "" }])
-  }
-
-  const handleMedicationChange = (index: number, value: string) => {
-    const newMedications = [...medications]
-    newMedications[index].medication = value
-    setMedications(newMedications)
-  }
-
-  const handleInstructionsChange = (index: number, value: string) => {
-    const newMedications = [...medications]
-    newMedications[index].instructions = value
-    setMedications(newMedications)
-  }
-
-  const issuePrescription = async () => {
-    if (!ethers.isAddress(patientCard)) {
-      setError("Endereço da carteira do paciente inválido")
-      return
-    }
-    
-    if (medications.length === 0 || medications[0].medication === "-Medicamento-") {
-      setError("Selecione pelo menos um medicamento")
-      return
-    }
-    
-    setLoading(true)
-    setError("")
-    setSuccess("")
-
-    try {
-      if (!contract) {
-        throw new Error("Contrato não carregado corretamente.")
-      }
-
-      for (const med of medications) {
-        if (med.medication !== "-Medicamento-") {
-          const tx = await contract.issuePrescription(med.medication, patientCard)
-          await tx.wait()
+            try {
+                const tx = await contract.mintMedicine(name, batchNumber, expirationDate);
+                await tx.wait();
+                alert("Medicine minted successfully!");
+            } catch (error) {
+                console.error("Error minting medicine:", error);
+                alert("Error minting medicine: " + error.message);
+            }
         }
-      }
 
-      setSuccess("Receita emitida com sucesso na blockchain!")
-    } catch (err) {
-      console.error("Erro ao emitir receita:", err)
-      setError("Falha ao emitir receita. Verifique se você tem permissão de médico.")
-    } finally {
-      setLoading(false)
-    }
-  }
+        async function transferMedicine() {
+            if (!contract) {
+                alert("Please connect your wallet first!");
+                return;
+            }
+            
+            const tokenId = document.getElementById("transferTokenId").value;
+            const to = document.getElementById("transferTo").value;
+            
+            if (!tokenId || !to) {
+                alert("Please fill in all required fields");
+                return;
+            }
+            
+            if (!ethers.utils.isAddress(to)) {
+                alert("Invalid receiver address format");
+                return;
+            }
 
-  return (
-    <div className="min-h-screen flex flex-col">
-      <Header />
-      <main className="flex-1 container mx-auto py-12 px-6 md:px-6 lg:px-32">
-        {error && (
-          <Alert variant="destructive" className="mb-4">
-            <AlertDescription>{error}</AlertDescription>
-          </Alert>
-        )}
-        
-        {success && (
-          <Alert className="mb-4 bg-green-100 border-green-600">
-            <AlertDescription className="text-green-700">{success}</AlertDescription>
-          </Alert>
-        )}
+            try {
+                const tx = await contract.transferMedicine(tokenId, to);
+                await tx.wait();
+                alert("Medicine transferred successfully!");
+            } catch (error) {
+                console.error("Error transferring medicine:", error);
+                alert("Error transferring medicine: " + error.message);
+            }
+        }
 
-        {!account ? (
-          <div className="text-center py-10">
-            <p>Conectando à sua carteira...</p>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-            <div>
-              <h2 className="text-2xl font-bold mb-8">Gerar nova receita</h2>
-              <div className="text-sm text-gray-500 mb-4">
-                Conectado como: {account.substring(0, 6)}...{account.substring(account.length - 4)}
-                {isDoctor ? " (Médico)" : " (Não é médico)"}
-              </div>
+        async function issuePrescription() {
+            if (!contract) {
+                alert("Please connect your wallet first!");
+                return;
+            }
+            
+            const medicineName = document.getElementById("prescMedicineName").value;
+            const patient = document.getElementById("prescPatient").value;
+            
+            if (!medicineName || !patient) {
+                alert("Please fill in all required fields");
+                return;
+            }
+            
+            if (!ethers.utils.isAddress(patient)) {
+                alert("Invalid patient address format");
+                return;
+            }
 
-              <div className="space-y-6">
-                <TextField
-                  value={patientCard}
-                  onChange={(e) => setPatientCard(e.target.value)}
-                  label="Carteira do paciente"
-                  fullWidth
-                  placeholder="0x..."
-                />
+            try {
+                const tx = await contract.issuePrescription(medicineName, patient);
+                await tx.wait();
+                alert("Prescription issued successfully!");
+            } catch (error) {
+                console.error("Error issuing prescription:", error);
+                alert("Error issuing prescription: " + error.message);
+            }
+        }
 
-                {medications.map((med, index) => (
-                  <div key={index} className="space-y-6">
-                    <Select value={med.medication} onValueChange={(value) => handleMedicationChange(index, value)}>
-                      <SelectTrigger className="border-[#e0e0e0] flex justify-between">
-                        <SelectValue placeholder="Selecione um medicamento" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="-Medicamento-">---</SelectItem>
-                        <SelectItem value="Dipiroca">Dipiroca</SelectItem>
-                        <SelectItem value="Para ce ta mal">Para ce ta mal</SelectItem>
-                      </SelectContent>
-                    </Select>
+        async function sellMedicine() {
+            if (!contract) {
+                alert("Please connect your wallet first!");
+                return;
+            }
+            
+            const tokenId = document.getElementById("sellTokenId").value;
+            const patient = document.getElementById("sellToPatient").value;
+            
+            if (!tokenId || !patient) {
+                alert("Please fill in all required fields");
+                return;
+            }
+            
+            if (!ethers.utils.isAddress(patient)) {
+                alert("Invalid patient address format");
+                return;
+            }
+            
+            try {
+                const tx = await contract.sellMedicine(tokenId, patient);
+                await tx.wait();
+                alert("Medicine sold successfully!");
+            } catch (error) {
+                console.error("Error selling medicine:", error);
+            }
+        }
 
-                    <TextField
-                      value={med.instructions}
-                      onChange={(e) => handleInstructionsChange(index, e.target.value)}
-                      label="Instruções do medicamento"
-                      fullWidth
-                      multiline
-                      minRows={4}
-                    />
-                  </div>
-                ))}
+        async function getMedicineInfo() {
+            const tokenId = document.getElementById("queryTokenId").value;
 
-                <a onClick={handleAddMedication} className="text-blue-500 hover:underline cursor-pointer">
-                  Adicionar novo medicamento
-                </a>
-              </div>
-            </div>
+            try {
+                const medicine = await contract.medicines(tokenId);
+                document.getElementById("medicineInfo").innerText = `
+                    Name: ${medicine[0]}
+                    Batch: ${medicine[1]}
+                    Expiration: ${medicine[2]}
+                    Holder: ${medicine[3]}
+                    Sold: ${medicine[4]}
+                `;
+            } catch (error) {
+                console.error("Error fetching medicine info:", error);
+            }
+        }
 
-            <div className="flex flex-col justify-between">
-              <h2 className="text-2xl font-bold mb-8">Visualização da receita</h2>
-              <p className="font-medium">{patientName}</p>
-              <p className="text-sm text-gray-500">Endereço: {patientCard || "Não informado"}</p>
+        async function getPrescription() {
+            const patient = document.getElementById("queryPatient").value;
 
-              {medications.map((med, index) => (
-                <p key={index} className="font-medium">{med.medication} - <span className="font-normal">{med.instructions}</span></p>
-              ))}
-
-              <Button className="bg-[#d5a021] text-white mt-16" onClick={issuePrescription} disabled={loading || !isDoctor}>
-                <Check className="mr-2 h-5 w-5" />
-                {loading ? "Processando..." : "Finalizar receita"}
-              </Button>
-            </div>
-          </div>
-        )}
-      </main>
-    </div>
-  )
-}
+            try {
+                const presc = await contract.prescriptions(patient);
+                document.getElementById("prescriptionInfo").innerText = `
+                    Patient: ${presc[0]}
+                    Medicine: ${presc[1]}
+                    Valid: ${presc[2]}
+                `;
+            } catch (error) {
+                console.error("Error fetching prescription:", error);
+            }
+        }
+    </script>
+</body>
+</html>

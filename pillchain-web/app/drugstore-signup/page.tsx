@@ -15,19 +15,19 @@ export default function DoctorSignup() {
       <div className="h-screen w-[60%] flex flex-col justify-center items-center p-8 gap-8">
         <main className="flex-1 container mx-auto flex justify-center items-center">
           <div className="w-full max-w-md bg-white rounded-md shadow-sm border border-[#e0e0e0] p-8">
-            <h1 className="text-center text-2xl font-bold mb-8">Cadastro de Médico</h1>
+            <h1 className="text-center text-2xl font-bold mb-8">Farmácia nova por aqui?</h1>
             <form className="space-y-4">
               <div className="space-y-1">
-                <TextField label="Nome" variant="outlined" size="medium" fullWidth />
+                <TextField label="Nome da farmácia" variant="outlined" size="medium" fullWidth />
               </div>
               <div className="space-y-1">
-                <TextField label="CRM" variant="outlined" size="medium" fullWidth />
+                <TextField label="email" variant="outlined" size="medium" fullWidth />
               </div>
               <div className="space-y-1">
-                <TextField label="Especialidade" variant="outlined" size="medium" fullWidth />
+                <TextField label="CNPJ" variant="outlined" size="medium" fullWidth />
               </div>
               <div className="mt-2">
-                <a href="/doctor-login" className="text-blue-500 hover:underline">Já tenho cadastro</a>
+                <a href="/drugstore-login" className="text-blue-500 hover:underline">Já tenho cadastro</a>
               </div>
               <div className="pt-4 flex justify-center">
                 <button type="submit" className="bg-[#D5A021] text-white rounded-md py-3 px-6 flex items-center justify-center gap-2">
