@@ -8,18 +8,18 @@ import { useState } from "react"
 export default function LoginDrugstore() {
   const [code, setCode] = useState(Array(6).fill(""))
 
-  interface HandleChangeProps {
+interface HandleChangeProps {
     index: number;
     value: string;
-  }
+}
 
-  const handleChange = ({ index, value }: HandleChangeProps) => {
+const handleChange = ({ index, value }: HandleChangeProps) => {
     if (/^\d?$/.test(value)) {
-      const newCode = [...code]
-      newCode[index] = value
-      setCode(newCode)
+        const newCode = [...code]
+        newCode[index] = value
+        setCode(newCode)
     }
-  }
+}
 
   return (
     <div className="flex flex-row w-full min-h-screen">
@@ -41,8 +41,7 @@ export default function LoginDrugstore() {
                   <TextField
                     key={index}
                     value={digit}
-                    onChange={(e) => handleChange({ index, value: e.target.value })}
-                    inputProps={{ maxLength: 1, style: { textAlign: 'center' } }}
+                    onChange={(e) => handleChange({ index, value: e.target.value })}                    inputProps={{ maxLength: 1, style: { textAlign: 'center' } }}
                     variant="outlined"
                     size="medium"
                     style={{ width: '50px' }}
