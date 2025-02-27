@@ -1068,7 +1068,7 @@ export default function MedicalPrescription() {
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="-Medicamento-">---</SelectItem>
-                        <SelectItem value="Dipiroca">Dipiroca</SelectItem>
+                        <SelectItem value="RITALINA">RITALINA</SelectItem>
                         <SelectItem value="Para ce ta mal">Para ce ta mal</SelectItem>
                       </SelectContent>
                     </Select>
