@@ -3,7 +3,7 @@ import Header from "@/components/Header";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useRouter } from "next/navigation";
-import { AlertTriangle, Book, List, PlusCircle, Receipt, Search } from "lucide-react";
+import { AlertTriangle, Book, List, PlusCircle, Search } from "lucide-react";
 
 export default function Home() {
   const router = useRouter();
@@ -37,23 +37,26 @@ export default function Home() {
             Medicamento controlado mais vendido no mês atual.
           </p>
         </Card>
+      </div>  
+      <div className="flex flex-row h-94 w-full px-32 gap-4 pt-8">
+        <Card className="w-full"></Card>
       </div>
-
+        
       {/* Botões de ação */}
       <div className="flex flex-row h-16 w-full px-32 gap-6 pt-8">
-        <Button variant="outline" className="w-full flex items-center justify-center h-12">
+        <Button variant="outline" className="w-full flex items-center justify-center h-12" onClick={() => router.push("/add-medication")}>
           <PlusCircle size={24} />
           <p> Adicionar Medicamento</p>
         </Button>
-        <Button variant="outline" className="w-full flex items-center justify-center h-12">
+        <Button variant="outline" className="w-full flex items-center justify-center h-12" onClick={() => router.push("/consult-medication")}>
           <Search size={24} />
           <p> Consultar Medicamento</p>
         </Button>
-        <Button variant="outline" className="w-full flex items-center justify-center h-12">
+        <Button variant="outline" className="w-full flex items-center justify-center h-12" onClick={() => router.push("/consult-prescription")}>
           <Book size={24} />
           <p> Consultar Receita</p>
         </Button>
-        <Button variant="outline" className="w-full flex items-center justify-center h-12">
+        <Button variant="outline" className="w-full flex items-center justify-center h-12" onClick={() => router.push("/consult-transactions")}>
           <List size={24} />
           <p> Consultar Transações</p>
         </Button>
