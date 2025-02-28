@@ -76,7 +76,6 @@ model ClientQRCode {
   validUntil DateTime
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
-  url      = "file:./dev.db"
 }
 
 model SalesHistory {
