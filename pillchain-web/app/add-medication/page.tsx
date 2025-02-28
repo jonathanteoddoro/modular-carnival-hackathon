@@ -58,11 +58,11 @@ export default function AddMedication() {
             required
             className="bg-gray-50"
           />
-          <Button type="submit" className="w-full mt-4 bg-blue-600 text-white hover:bg-blue-700">
+          <Button type="submit" className="w-full mt-4 bg-red-500 text-white hover:bg-red-700">
             Adicionar Medicamento
           </Button>
         </form>
-        <Button onClick={() => router.push("/dashboard")} className="w-full mt-4 bg-gray-300 text-white hover:bg-gray-400">
+        <Button onClick={() => router.push("/dashboard")} className="w-full mt-4 bg-gray-400 text-white">
           Voltar para a página inicial
         </Button>
       </div>
