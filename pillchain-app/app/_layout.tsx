@@ -28,7 +28,7 @@ import {
   Montserrat_700Bold_Italic,
   Montserrat_800ExtraBold_Italic,
   Montserrat_900Black_Italic,
-} from '@expo-google-fonts/montserrat';
+} from "@expo-google-fonts/montserrat";
 
 import {
   FiraCode_300Light,
@@ -36,9 +36,12 @@ import {
   FiraCode_500Medium,
   FiraCode_600SemiBold,
   FiraCode_700Bold,
-} from '@expo-google-fonts/fira-code';
+} from "@expo-google-fonts/fira-code";
 
 import { useColorScheme } from "@/hooks/useColorScheme";
+
+import { Buffer } from "buffer";
+global.Buffer = global.Buffer || Buffer;
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
@@ -98,7 +101,6 @@ export default function RootLayout() {
         <Stack.Screen name="login/signin" />
         <Stack.Screen name="login/signup" />
         <Stack.Screen name="pages/transcript/[id]" />
-
       </Stack>
       <StatusBar style="auto" />
     </ThemeProvider>

@@ -8,14 +8,15 @@ datasource db {
 }
 
 model Client {
-  id        Int      @id @default(autoincrement())
-  name      String
-  email     String   @unique
-  cpf       String   @unique
-  password  String
-  wallet    String   @unique
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id           Int            @id @default(autoincrement())
+  name         String
+  email        String         @unique
+  cpf          String         @unique
+  password     String
+  wallet       String         @unique
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  ClientQRCode ClientQRCode[]
 }
 
 model Medicine {
@@ -41,13 +42,12 @@ model Doctor {
 }
 
 model Prescription {
-  id         Int    @id @default(autoincrement())
+  id         Int      @id @default(autoincrement())
   doctorId   Int
   clientId   Int
-  identifier String @unique
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  identifier String   @unique
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 }
 
 model Pharmacy {
@@ -71,11 +71,14 @@ model PrescriptionMedicine {
 
 model ClientQRCode {
   id         Int      @id @default(autoincrement())
-  clientId   Int
-  qrCode     String
+  clientId   Int      @unique
+  qrCode     String   @unique
   validUntil DateTime
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
+  client     Client   @relation(fields: [clientId], references: [id])
+
+  @@index([clientId])
 }
 
 model SalesHistory {

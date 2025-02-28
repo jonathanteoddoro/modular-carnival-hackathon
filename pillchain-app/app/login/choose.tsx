@@ -7,21 +7,32 @@ import { Image, StyleSheet } from "react-native";
 export default function ChooseScreen() {
   return (
     <ThemedView style={styles.container}>
-      <Image source={require("../../assets/images/splash-icon.png")} style={{
-        resizeMode: "contain",
-        width: 200,
-      }} />
+      <Image
+        source={require("../../assets/images/splash-icon.png")}
+        style={{
+          resizeMode: "contain",
+          width: 200,
+        }}
+      />
       <ThemedView style={styles.buttonContainer}>
         <Button color="#06770E">
-          <Link href="/pages/access">
-            <ThemedText darkColor="#fff" lightColor="#fff" style={{ fontFamily: "Montserrat_500Medium" }}>
+          <Link href="/login/signin">
+            <ThemedText
+              darkColor="#fff"
+              lightColor="#fff"
+              style={{ fontFamily: "Montserrat_500Medium" }}
+            >
               Fazer login
             </ThemedText>
           </Link>
         </Button>
         <Button color="#434371">
           <Link href="/login/signup">
-            <ThemedText darkColor="#fff" lightColor="#fff" style={{ fontFamily: "Montserrat_500Medium" }}>
+            <ThemedText
+              darkColor="#fff"
+              lightColor="#fff"
+              style={{ fontFamily: "Montserrat_500Medium" }}
+            >
               Criar conta
             </ThemedText>
           </Link>
@@ -36,7 +47,6 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-
   },
   buttonContainer: {
     width: "100%",

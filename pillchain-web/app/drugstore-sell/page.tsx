@@ -1,17 +1,23 @@
-"use client"
-import { useState } from "react"
-import type React from "react"
+"use client";
+import { useState } from "react";
+import type React from "react";
 
-import Header from "@/components/Header"
-import { Check, AlertCircle, Loader2 } from "lucide-react"
-import { useRouter } from "next/navigation"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
-import { ethers } from "ethers"
-import { toast } from "react-hot-toast"
+import Header from "@/components/Header";
+import { Check, AlertCircle, Loader2 } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { ethers } from "ethers";
+import { toast } from "react-hot-toast";
 
 // ABI only containing the sellMedicine function and relevant errors to reduce size
 const CONTRACT_ABI = [
@@ -72,30 +78,30 @@ const CONTRACT_ABI = [
         internalType: "string",
         name: "",
         type: "string",
-      }
+      },
     ],
     stateMutability: "view",
     type: "function",
   },
-]
+];
 
-const CONTRACT_ADDRESS = "0x25b594824a71a093beaCC5Cc786281d4441912e5"
+const CONTRACT_ADDRESS = "0x25b594824a71a093beaCC5Cc786281d4441912e5";
 
 export default function DrugstoreSell() {
-  const router = useRouter()
-  const [medicineId, setMedicineId] = useState("")
-  const [customerId, setCustomerId] = useState("")
-  const [loading, setLoading] = useState(false)
-  const [txHash, setTxHash] = useState("")
-  const [status, setStatus] = useState({ type: "", message: "" })
+  const router = useRouter();
+  const [medicineId, setMedicineId] = useState("");
+  const [customerId, setCustomerId] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [txHash, setTxHash] = useState("");
+  const [status, setStatus] = useState({ type: "", message: "" });
 
   const handleMedicineIdChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setMedicineId(e.target.value)
-  }
+    setMedicineId(e.target.value);
+  };
 
   const handleCustomerIdChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setCustomerId(e.target.value)
-  }
+    setCustomerId(e.target.value);
+  };
 
   // Função para salvar os dados da venda no banco de dados
   const saveSaleToDatabase = async (data: {
@@ -106,77 +112,87 @@ export default function DrugstoreSell() {
     transactionHash: string;
   }) => {
     try {
-      const response = await fetch('/api/sales', {
-        method: 'POST',
+      const response = await fetch("/api/sales", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify(data),
       });
-      
+
       if (!response.ok) {
-        throw new Error('Falha ao salvar dados da venda no banco de dados');
+        throw new Error("Falha ao salvar dados da venda no banco de dados");
       }
-      
+
       return await response.json();
     } catch (error) {
-      console.error('Erro ao salvar no banco de dados:', error);
+      console.error("Erro ao salvar no banco de dados:", error);
       throw error;
     }
   };
 
   const sellMedicine = async (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
 
     if (!medicineId || !customerId) {
-      setStatus({ type: "error", message: "Por favor, preencha todos os campos" })
-      return
+      setStatus({
+        type: "error",
+        message: "Por favor, preencha todos os campos",
+      });
+      return;
     }
 
     try {
-      setLoading(true)
-      setStatus({ type: "", message: "" })
+      setLoading(true);
+      setStatus({ type: "", message: "" });
 
       // Validate the customer address
       if (!ethers.isAddress(customerId)) {
-        setStatus({ type: "error", message: "Endereço de cliente inválido" })
-        return
+        setStatus({ type: "error", message: "Endereço de cliente inválido" });
+        return;
       }
 
       // Connect to the Ethereum provider
       if (!window.ethereum) {
-        setStatus({ type: "error", message: "Por favor, instale a MetaMask ou outro provedor Ethereum" })
-        return
+        setStatus({
+          type: "error",
+          message: "Por favor, instale a MetaMask ou outro provedor Ethereum",
+        });
+        return;
       }
 
       // Request account access
-      const provider = new ethers.BrowserProvider(window.ethereum)
-      const signer = await provider.getSigner()
-      const pharmacyWallet = await signer.getAddress()
+      const provider = new ethers.BrowserProvider(window.ethereum);
+      const signer = await provider.getSigner();
+      const pharmacyWallet = await signer.getAddress();
 
       // Create contract instance
-      const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer)
+      const contract = new ethers.Contract(
+        CONTRACT_ADDRESS,
+        CONTRACT_ABI,
+        signer
+      );
 
       // Get medicine name (adicionando chamada para obter o nome do remédio)
-      const tokenId = Number.parseInt(medicineId)
-      let medicineName = "Desconhecido"
-      
+      const tokenId = Number.parseInt(medicineId);
+      let medicineName = "Desconhecido";
+
       try {
-        medicineName = await contract.getMedicineName(tokenId)
+        medicineName = await contract.getMedicineName(tokenId);
       } catch (error) {
-        console.warn("Não foi possível obter o nome do remédio:", error)
+        console.warn("Não foi possível obter o nome do remédio:", error);
       }
 
       // Call the sellMedicine function
-      const patientAddress = customerId
+      const patientAddress = customerId;
 
       // Execute the transaction
-      const tx = await contract.sellMedicine(tokenId, patientAddress)
-      setTxHash(tx.hash)
+      const tx = await contract.sellMedicine(tokenId, patientAddress);
+      setTxHash(tx.hash);
 
       // Wait for transaction to be mined
-      toast.loading("Processando transação...")
-      await tx.wait()
+      toast.loading("Processando transação...");
+      await tx.wait();
 
       // Salvar os dados da venda no banco de dados
       await saveSaleToDatabase({
@@ -184,36 +200,41 @@ export default function DrugstoreSell() {
         medicineName,
         customerWallet: patientAddress,
         medicineId: tokenId,
-        transactionHash: tx.hash
-      })
+        transactionHash: tx.hash,
+      });
 
-      toast.dismiss()
-      toast.success("Venda registrada no histórico!")
-      setStatus({ type: "success", message: "Venda realizada e registrada com sucesso!" })
+      toast.dismiss();
+      toast.success("Venda registrada no histórico!");
+      setStatus({
+        type: "success",
+        message: "Venda realizada e registrada com sucesso!",
+      });
 
       // Reset form
-      setMedicineId("")
-      setCustomerId("")
+      setMedicineId("");
+      setCustomerId("");
     } catch (error: any) {
-      console.error("Erro ao vender remédio:", error)
-      let errorMessage = "Erro ao processar a venda"
+      console.error("Erro ao vender remédio:", error);
+      let errorMessage =
+        "Prescrição médida inválida. O usuário não tem permissão para realizar essa compra!";
 
       // Parse error message
       if (error.message) {
         if (error.message.includes("AccessControlUnauthorizedAccount")) {
-          errorMessage = "Permissão negada: Sua conta não tem o papel de farmácia"
+          errorMessage =
+            "Permissão negada: Sua conta não tem o papel de farmácia";
         } else if (error.message.includes("ERC721NonexistentToken")) {
-          errorMessage = "ID do remédio não existe"
+          errorMessage = "ID do remédio não existe";
         } else if (error.message.includes("user rejected transaction")) {
-          errorMessage = "Transação rejeitada pelo usuário"
+          errorMessage = "Transação rejeitada pelo usuário";
         }
       }
 
-      setStatus({ type: "error", message: errorMessage })
+      setStatus({ type: "error", message: errorMessage });
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col relative">
@@ -221,16 +242,26 @@ export default function DrugstoreSell() {
       <main className="flex-1 container mx-auto px-4 py-8">
         <Card className="w-full max-w-lg mx-auto">
           <CardHeader>
-            <CardTitle className="text-2xl font-bold text-center">Gerar venda para Cliente</CardTitle>
-            <CardDescription className="text-center">Preencha os detalhes da venda do medicamento</CardDescription>
+            <CardTitle className="text-2xl font-bold text-center">
+              Gerar venda para Cliente
+            </CardTitle>
+            <CardDescription className="text-center">
+              Preencha os detalhes da venda do medicamento
+            </CardDescription>
           </CardHeader>
           <CardContent>
             {status.message && (
               <Alert
-                className={`mb-6 ${status.type === "error" ? "bg-red-50 text-red-900" : "bg-green-50 text-green-900"}`}
+                className={`mb-6 ${
+                  status.type === "error"
+                    ? "bg-red-50 text-red-900"
+                    : "bg-green-50 text-green-900"
+                }`}
               >
                 <AlertCircle className="h-4 w-4" />
-                <AlertTitle>{status.type === "error" ? "Erro" : "Sucesso"}</AlertTitle>
+                <AlertTitle>
+                  {status.type === "error" ? "Erro" : "Sucesso"}
+                </AlertTitle>
                 <AlertDescription>{status.message}</AlertDescription>
               </Alert>
             )}
@@ -251,7 +282,7 @@ export default function DrugstoreSell() {
               <div className="space-y-2">
                 <Label htmlFor="customerId">Endereço do Cliente</Label>
                 <Input
-                className="h-12"
+                  className="h-12"
                   id="customerId"
                   placeholder="0x..."
                   value={customerId}
@@ -267,7 +298,11 @@ export default function DrugstoreSell() {
                 </div>
               )}
 
-              <Button type="submit" className="w-full h-12 bg-[#D5A021]" disabled={loading}>
+              <Button
+                type="submit"
+                className="w-full h-12 bg-[#D5A021]"
+                disabled={loading}
+              >
                 {loading ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -293,5 +328,5 @@ export default function DrugstoreSell() {
         <AlertCircle size={24} />
       </Button>
     </div>
-  )
+  );
 }

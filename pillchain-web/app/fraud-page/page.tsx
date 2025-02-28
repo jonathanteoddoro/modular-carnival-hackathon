@@ -1,29 +1,29 @@
-"use client"
-import Header from "@/components/Header"
-import { Button } from "@/components/ui/button"
-import { Card } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { FileText, Search, ShieldAlert, ArrowLeft } from "lucide-react"
-import { useRouter } from "next/navigation"
-import { useState } from "react"
+"use client";
+import Header from "@/components/Header";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { FileText, Search, ShieldAlert, ArrowLeft } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 const farmacias = [
-  { id: 1, nome: "Farmácia Central", cidade: "São Paulo" },
-  { id: 2, nome: "Drogaria Saúde", cidade: "Rio de Janeiro" },
-  { id: 3, nome: "Farmamed", cidade: "Belo Horizonte" },
-  { id: 4, nome: "Drogaria Bem-Estar", cidade: "Curitiba" },
-  { id: 5, nome: "FarmaTotal", cidade: "Porto Alegre" },
-]
+  { id: 1, nome: "Farmácia Central" },
+  { id: 2, nome: "Drogaria Saúde" },
+  { id: 3, nome: "Farmamed" },
+  { id: 4, nome: "Drogaria Bem-Estar" },
+  { id: 5, nome: "FarmaTotal" },
+];
 
 export default function Fraude() {
-  const router = useRouter()
-  const [searchTerm, setSearchTerm] = useState("")
+  const router = useRouter();
+  const [searchTerm, setSearchTerm] = useState("");
 
   const filteredFarmacias = farmacias.filter(
     (farmacia) =>
       farmacia.nome.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      farmacia.cidade.toLowerCase().includes(searchTerm.toLowerCase()),
-  )
+      farmacia.cidade.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   return (
     <div className="min-h-screen bg-gray-50 ">
@@ -33,7 +33,8 @@ export default function Fraude() {
           <div className="flex items-center">
             <ShieldAlert className="h-8 w-8 text-red-600 mr-3" />
             <h1 className="text-2xl md:text-3xl font-bold text-gray-900">
-              Farmácias <span className="text-red-600">suspeitas de fraude</span>
+              Farmácias{" "}
+              <span className="text-red-600">suspeitas de fraude</span>
             </h1>
           </div>
           <div className="flex items-center gap-4">
@@ -46,7 +47,11 @@ export default function Fraude() {
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
             </div>
-            <Button variant="outline" onClick={() => router.push("/dashboard")} className="flex items-center">
+            <Button
+              variant="outline"
+              onClick={() => router.push("/dashboard")}
+              className="flex items-center"
+            >
               <ArrowLeft className="h-4 w-4 mr-1" />
               Voltar para a Dashboard
             </Button>
@@ -57,31 +62,46 @@ export default function Fraude() {
           <div className="p-4 bg-white border-b border-gray-200">
             <h2 className="text-lg font-semibold text-gray-800 flex items-center">
               <ShieldAlert className="h-5 w-5 text-red-500 mr-2" />
-              Lista de Farmácias Suspeitas 
+              Lista de Farmácias Suspeitas
             </h2>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
                 <tr className="bg-gray-50">
-                  <th className="text-left p-4 text-sm font-medium text-gray-600 uppercase tracking-wider">Nome</th>
-                  <th className="text-left p-4 text-sm font-medium text-gray-600 uppercase tracking-wider">Cidade</th>
-                  <th className="text-center p-4 text-sm font-medium text-gray-600 uppercase tracking-wider">Ações</th>
+                  <th className="text-left p-4 text-sm font-medium text-gray-600 uppercase tracking-wider">
+                    Nome
+                  </th>
+                  <th className="text-center p-4 text-sm font-medium text-gray-600 uppercase tracking-wider">
+                    Ações
+                  </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200">
                 {filteredFarmacias.length > 0 ? (
                   filteredFarmacias.map((farmacia) => (
-                    <tr key={farmacia.id} className="hover:bg-gray-50 transition-colors">
-                      <td className="p-4 text-gray-900 font-medium">{farmacia.nome}</td>
-                      <td className="p-4 text-gray-700">{farmacia.cidade}</td>
+                    <tr
+                      key={farmacia.id}
+                      className="hover:bg-gray-50 transition-colors"
+                    >
+                      <td className="p-4 text-gray-900 font-medium">
+                        {farmacia.nome}
+                      </td>
                       <td className="p-4">
                         <div className="flex justify-center gap-2">
-                          <Button variant="outline" size="sm" className="flex items-center">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="flex items-center"
+                          >
                             <FileText className="h-4 w-4 mr-1" />
                             Relatório
                           </Button>
-                          <Button variant="destructive" size="sm" className="flex items-center">
+                          <Button
+                            variant="destructive"
+                            size="sm"
+                            className="flex items-center"
+                          >
                             <ShieldAlert className="h-4 w-4 mr-1" />
                             Auditoria
                           </Button>
@@ -100,11 +120,11 @@ export default function Fraude() {
             </table>
           </div>
           <div className="bg-gray-50 px-4 py-3 border-t border-gray-200 text-sm text-gray-500">
-            Mostrando {filteredFarmacias.length} de {farmacias.length} farmácias suspeitas
+            Mostrando {filteredFarmacias.length} de {farmacias.length} farmácias
+            suspeitas
           </div>
         </Card>
       </div>
     </div>
-  )
+  );
 }
-
