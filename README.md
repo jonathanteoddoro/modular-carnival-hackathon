@@ -16,9 +16,9 @@
 
 Pill Chain é a revolução no controle de medicamentos controlados: blockchain, segurança e rastreabilidade para impedir fraudes, garantir conformidade e proteger a saúde pública com transparência total.
 
-[**Link para o vídeo demonstração**](https://drive.google.com/file/d/1T8GDYppexEvwawb0Mi4xngtactPaFbXN/view?usp=sharing)
+[**Link para o vídeo demonstração**](https://youtu.be/6aIlZpEKjMk)
 
-[**Link para o pitch**]()
+[**Link para o pitch**](https://youtu.be/sm3f3sHJpQw)
 
 [**Link para os slides**](https://www.canva.com/design/DAGgZDcZcUI/4hv_4K-nVOxZSgJU2EWO1w/edit?utm_content=DAGgZDcZcUI&utm_campaign=designshare&utm_medium=link2&utm_source=sharebutton)
 
