@@ -1,8 +1,33 @@
+from fastapi import FastAPI
 import pandas as pd
 import joblib
 from preprocessing import preprocess_data
 
-def prever_fraude(compra, venda, farmacia, medicamento, ano_mes, df_historico):
+app = FastAPI()
+
+from pydantic import BaseModel
+
+class CompraVendaInput(BaseModel):
+    compra: float
+    venda: float
+    farmacia: str
+    medicamento: str
+    ano_mes: str
+
+# Carregar modelo e features na inicialização da API
+modelo_carregado = joblib.load('model/modelo_fraude.pkl')
+features = joblib.load('model/features.pkl')
+df_historico = pd.read_csv('data/dados_farmacia.csv')
+
+@app.post("/prever_fraude/")
+def prever_fraude(dados: CompraVendaInput):
+    compra = dados.compra
+    venda = dados.venda
+    farmacia = dados.farmacia
+    medicamento = dados.medicamento
+    ano_mes = dados.ano_mes
+    print(compra, venda, farmacia, medicamento, ano_mes)
+    
     # Criar um novo registro com os dados fornecidos
     novo_registro = pd.DataFrame({
         'Farmácia': [farmacia],
@@ -18,27 +43,9 @@ def prever_fraude(compra, venda, farmacia, medicamento, ano_mes, df_historico):
 
     # Selecionar apenas a última linha correspondente ao novo dado
     novo_registro_processado = df_input_processado[df_input_processado['ano_mes'] == ano_mes].tail(1)
-
-    # Carregar o modelo treinado e as features
-    modelo_carregado = joblib.load('model/modelo_fraude.pkl')
-    features = joblib.load('model/features.pkl')
-
-    # Selecionar apenas as features relevantes
     novo_registro_processado = novo_registro_processado[features]
 
     # Fazer previsão
     predicao = modelo_carregado.predict(novo_registro_processado)
     
-    return "Fraude" if predicao[0] == 1 else "Não é fraude"
-
-if __name__ == "__main__":
-    df_historico = pd.read_csv('data/dados_farmacia.csv')
-
-    compra_nova = 100
-    venda_nova = 200
-    farmacia_nova = 'Farma08'
-    medicamento_novo = 'Diclofenaco'
-    ano_mes_novo = '2025-02'
-
-    resultado = prever_fraude(compra_nova, venda_nova, farmacia_nova, medicamento_novo, ano_mes_novo, df_historico)
-    print("Resultado da previsão para o novo registro:", resultado)
+    return {"resultado": "Fraude" if predicao[0] == 1 else "Não é fraude"}

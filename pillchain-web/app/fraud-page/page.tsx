@@ -5,25 +5,54 @@ import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { FileText, Search, ShieldAlert, ArrowLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { Badge } from "@/components/ui/badge";
 
-const farmacias = [
-  { id: 1, nome: "Farmácia Central" },
-  { id: 2, nome: "Drogaria Saúde" },
-  { id: 3, nome: "Farmamed" },
-  { id: 4, nome: "Drogaria Bem-Estar" },
-  { id: 5, nome: "FarmaTotal" },
-];
+interface Fraud {
+  id: number;
+  pharmacyName: string;
+  description: string;
+  status: string;
+  severity: string;
+  reportedDate: string;
+}
 
 export default function Fraude() {
   const router = useRouter();
   const [searchTerm, setSearchTerm] = useState("");
+  const [frauds, setFrauds] = useState<Fraud[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const filteredFarmacias = farmacias.filter(
-    (farmacia) =>
-      farmacia.nome.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      farmacia.cidade.toLowerCase().includes(searchTerm.toLowerCase())
+  useEffect(() => {
+    const fetchFrauds = async () => {
+      try {
+        const response = await fetch('/api/frauds');
+        if (!response.ok) throw new Error('Failed to fetch fraud data');
+        const data = await response.json();
+        setFrauds(data);
+      } catch (error) {
+        console.error('Error fetching fraud data:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    fetchFrauds();
+  }, []);
+
+  const filteredFrauds = frauds.filter(
+    (fraud) =>
+      fraud.pharmacyName.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  const getSeverityColor = (severity: string) => {
+    switch (severity.toUpperCase()) {
+      case 'HIGH': return 'bg-red-100 text-red-800';
+      case 'MEDIUM': return 'bg-yellow-100 text-yellow-800';
+      case 'LOW': return 'bg-blue-100 text-blue-800';
+      default: return 'bg-gray-100 text-gray-800';
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 ">
@@ -72,20 +101,46 @@ export default function Fraude() {
                   <th className="text-left p-4 text-sm font-medium text-gray-600 uppercase tracking-wider">
                     Nome
                   </th>
+                  <th className="text-left p-4 text-sm font-medium text-gray-600 uppercase tracking-wider">
+                    Severidade
+                  </th>
+                  <th className="text-left p-4 text-sm font-medium text-gray-600 uppercase tracking-wider">
+                    Status
+                  </th>
+                  <th className="text-left p-4 text-sm font-medium text-gray-600 uppercase tracking-wider">
+                    Data Reportada
+                  </th>
                   <th className="text-center p-4 text-sm font-medium text-gray-600 uppercase tracking-wider">
                     Ações
                   </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200">
-                {filteredFarmacias.length > 0 ? (
-                  filteredFarmacias.map((farmacia) => (
+                {loading ? (
+                  <tr>
+                    <td colSpan={5} className="p-8 text-center text-gray-500">
+                      Carregando dados...
+                    </td>
+                  </tr>
+                ) : filteredFrauds.length > 0 ? (
+                  filteredFrauds.map((fraud) => (
                     <tr
-                      key={farmacia.id}
+                      key={fraud.id}
                       className="hover:bg-gray-50 transition-colors"
                     >
                       <td className="p-4 text-gray-900 font-medium">
-                        {farmacia.nome}
+                        {fraud.pharmacyName}
+                      </td>
+                      <td className="p-4">
+                        <Badge className={getSeverityColor(fraud.severity)}>
+                          {fraud.severity}
+                        </Badge>
+                      </td>
+                      <td className="p-4 text-gray-900">
+                        {fraud.status}
+                      </td>
+                      <td className="p-4 text-gray-900">
+                        {new Date(fraud.reportedDate).toLocaleDateString()}
                       </td>
                       <td className="p-4">
                         <div className="flex justify-center gap-2">
@@ -93,6 +148,7 @@ export default function Fraude() {
                             variant="outline"
                             size="sm"
                             className="flex items-center"
+                            onClick={() => router.push(`/fraud-page/${fraud.id}/report`)}
                           >
                             <FileText className="h-4 w-4 mr-1" />
                             Relatório
@@ -101,6 +157,7 @@ export default function Fraude() {
                             variant="destructive"
                             size="sm"
                             className="flex items-center"
+                            onClick={() => router.push(`/fraud-page/${fraud.id}/audit`)}
                           >
                             <ShieldAlert className="h-4 w-4 mr-1" />
                             Auditoria
@@ -111,7 +168,7 @@ export default function Fraude() {
                   ))
                 ) : (
                   <tr>
-                    <td colSpan={3} className="p-8 text-center text-gray-500">
+                    <td colSpan={5} className="p-8 text-center text-gray-500">
                       Nenhuma farmácia encontrada com os critérios de busca.
                     </td>
                   </tr>
@@ -120,7 +177,7 @@ export default function Fraude() {
             </table>
           </div>
           <div className="bg-gray-50 px-4 py-3 border-t border-gray-200 text-sm text-gray-500">
-            Mostrando {filteredFarmacias.length} de {farmacias.length} farmácias
+            Mostrando {filteredFrauds.length} de {frauds.length} farmácias
             suspeitas
           </div>
         </Card>

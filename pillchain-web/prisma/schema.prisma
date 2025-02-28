@@ -8,15 +8,14 @@ datasource db {
 }
 
 model Client {
-  id           Int            @id @default(autoincrement())
-  name         String
-  email        String         @unique
-  cpf          String         @unique
-  password     String
-  wallet       String         @unique
-  createdAt    DateTime       @default(now())
-  updatedAt    DateTime       @updatedAt
-  ClientQRCode ClientQRCode[]
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String   @unique
+  cpf       String   @unique
+  password  String
+  wallet    String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Medicine {
@@ -71,14 +70,11 @@ model PrescriptionMedicine {
 
 model ClientQRCode {
   id         Int      @id @default(autoincrement())
-  clientId   Int      @unique
-  qrCode     String   @unique
+  clientId   Int
+  qrCode     String
   validUntil DateTime
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
-  client     Client   @relation(fields: [clientId], references: [id])
-
-  @@index([clientId])
 }
 
 model SalesHistory {
@@ -111,4 +107,24 @@ model SupplyHistory {
   @@index([pharmacyWallet])
   @@index([supplierWallet])
   @@index([batchNumber])
+}
+model DetectedFraudes {
+  id           Int      @id @default(autoincrement())
+  pharmacyWallet String
+  medicineName   String
+  detectedAt     DateTime @default(now())
+  createdAt      DateTime @default(now())
+
+  @@index([pharmacyWallet])
+  @@index([medicineName])
+}
+
+
+model Medication {
+  id                Int      @id @default(autoincrement())
+  name              String
+  factory           String
+  activePrinciple   String
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
 }

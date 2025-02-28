@@ -1,8 +1,6 @@
 "use client"
 import { useState } from "react"
 import type React from "react"
-
-import Header from "@/components/Header"
 import { Check, AlertCircle, Loader2 } from "lucide-react"
 import { ethers } from "ethers"
 import { Button } from "@/components/ui/button"
@@ -11,6 +9,9 @@ import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { toast } from "react-hot-toast"
+import dayjs from 'dayjs'
+import Header from "@/components/Header"
+
 
 // Extend the Window interface to include the ethereum property
 declare global {
@@ -107,6 +108,43 @@ export default function Supplier() {
     }
   };
 
+  // Função para chamar a rota de verificação de fraude
+  const checkFraud = async () => {
+    try {
+      const compra = Number(quantity); // A quantidade comprada
+      const ano_mes = dayjs().format('YYYY-MM'); // Mês/ano da compra
+
+      // Chamar a rota de verificação de fraude
+      const response = await fetch('/api/checkFraud', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          pharmacyWallet: pharmacyAddress,
+          medicineName,
+          compra,
+          ano_mes,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        if (data.resultado === "Fraude") {
+          toast.error("Fraude detectada! A compra não pode ser concluída.");
+        } else {
+          toast.success("Compra verificada com sucesso.");
+        }
+      } else {
+        throw new Error(data.message || 'Erro ao verificar fraude');
+      }
+    } catch (error) {
+      console.error("Erro na verificação de fraude:", error);
+      toast.error("Erro ao verificar fraude");
+    }
+  };
+
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
@@ -165,6 +203,9 @@ export default function Supplier() {
         message: `Sucesso! ${quantity} unidades de ${medicineName} geradas para a farmácia.`,
       })
 
+      // Chama a função para verificar a fraude após a transação ser concluída
+      await checkFraud()
+
       // Reset form
       setMedicineName("")
       setBatchNumber("")
@@ -186,7 +227,6 @@ export default function Supplier() {
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
-      <Header />
       <main className="flex-1 container mx-auto px-4 py-8">
         <Card className="w-full max-w-lg mx-auto">
           <CardHeader>
@@ -285,7 +325,7 @@ export default function Supplier() {
                 ) : (
                   <>
                     <Check className="mr-2 h-4 w-4" />
-                    Finalizar venda
+                    Gerar Medicamento
                   </>
                 )}
               </Button>
