@@ -58,6 +58,25 @@ const CONTRACT_ABI = [
     name: "MedicineSold",
     type: "event",
   },
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "_tokenId",
+        type: "uint256",
+      },
+    ],
+    name: "getMedicineName",
+    outputs: [
+      {
+        internalType: "string",
+        name: "",
+        type: "string",
+      }
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
 ]
 
 const CONTRACT_ADDRESS = "0x25b594824a71a093beaCC5Cc786281d4441912e5"
@@ -77,6 +96,34 @@ export default function DrugstoreSell() {
   const handleCustomerIdChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setCustomerId(e.target.value)
   }
+
+  // Função para salvar os dados da venda no banco de dados
+  const saveSaleToDatabase = async (data: {
+    pharmacyWallet: string;
+    medicineName: string;
+    customerWallet: string;
+    medicineId: number;
+    transactionHash: string;
+  }) => {
+    try {
+      const response = await fetch('/api/sales', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      });
+      
+      if (!response.ok) {
+        throw new Error('Falha ao salvar dados da venda no banco de dados');
+      }
+      
+      return await response.json();
+    } catch (error) {
+      console.error('Erro ao salvar no banco de dados:', error);
+      throw error;
+    }
+  };
 
   const sellMedicine = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -105,12 +152,22 @@ export default function DrugstoreSell() {
       // Request account access
       const provider = new ethers.BrowserProvider(window.ethereum)
       const signer = await provider.getSigner()
+      const pharmacyWallet = await signer.getAddress()
 
       // Create contract instance
       const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer)
 
-      // Call the sellMedicine function
+      // Get medicine name (adicionando chamada para obter o nome do remédio)
       const tokenId = Number.parseInt(medicineId)
+      let medicineName = "Desconhecido"
+      
+      try {
+        medicineName = await contract.getMedicineName(tokenId)
+      } catch (error) {
+        console.warn("Não foi possível obter o nome do remédio:", error)
+      }
+
+      // Call the sellMedicine function
       const patientAddress = customerId
 
       // Execute the transaction
@@ -121,8 +178,18 @@ export default function DrugstoreSell() {
       toast.loading("Processando transação...")
       await tx.wait()
 
+      // Salvar os dados da venda no banco de dados
+      await saveSaleToDatabase({
+        pharmacyWallet,
+        medicineName,
+        customerWallet: patientAddress,
+        medicineId: tokenId,
+        transactionHash: tx.hash
+      })
+
       toast.dismiss()
-      setStatus({ type: "success", message: "Venda realizada com sucesso!" })
+      toast.success("Venda registrada no histórico!")
+      setStatus({ type: "success", message: "Venda realizada e registrada com sucesso!" })
 
       // Reset form
       setMedicineId("")
@@ -228,4 +295,3 @@ export default function DrugstoreSell() {
     </div>
   )
 }
-
