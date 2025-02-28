@@ -29,11 +29,11 @@ export default function ConsultPrescription() {
             variant="outlined"
             className="bg-gray-50"
           />
-          <Button type="submit" className="w-full mt-4 bg-red-500 text-white hover:bg-red-700 h-10 max-w-xs mx-auto">
+          <Button type="submit" className="w-full mt-4 bg-red-500 text-white hover:bg-red-700 h-10 max-w-lg">
             Consultar Receita
           </Button>
         </form>
-        <Button onClick={() => router.push("/dashboard")} className="w-full mt-2 bg-gray-400 text-white hover:bg-gray-400 h-10 max-w-xs mx-auto">
+        <Button onClick={() => router.push("/dashboard")} className="w-full mt-2 bg-gray-400 text-white hover:bg-gray-400 h-10 max-w-lg">
           Voltar para a Dashboard
         </Button>
       </div>
