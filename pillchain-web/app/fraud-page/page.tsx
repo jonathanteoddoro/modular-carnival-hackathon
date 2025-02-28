@@ -28,7 +28,7 @@ export default function Fraude() {
   return (
     <div className="min-h-screen bg-gray-50 ">
       <Header />
-      <div className="container mx-auto px-4 md:px-6 lg:px-32 py-8 px-32">
+      <div className="container mx-auto px-4 md:px-6 lg:px-32 py-8">
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-6 gap-4">
           <div className="flex items-center">
             <ShieldAlert className="h-8 w-8 text-red-600 mr-3" />
