@@ -2,7 +2,7 @@
 "use client"
 import Header from "@/components/Header";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import TextField from "@mui/material/TextField";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
@@ -18,29 +18,24 @@ export default function ConsultTransactions() {
   return (
     <div>
       <Header />
-      <div className="flex flex-col px-32 gap-4 pt-8">
-        <h1 className="text-3xl font-bold">Consultar Transações</h1>
-        <Input
-          type="text"
-          placeholder="Digite o ID da transação"
-          value={transactionId}
-          onChange={(e) => setTransactionId(e.target.value)}
-          className="mt-4"
-        />
-        <Button
-          variant="outline"
-          onClick={handleSearch}
-          className="w-full mt-4"
-        >
-          Consultar Transação
-        </Button>
-        <div className="mt-8">
-          {/* Placeholder para exibir detalhes da transação */}
-          <p>Resultado da consulta para transação ID: {transactionId}</p>
-          {/* Aqui você pode mostrar os detalhes da transação */}
-        </div>
-        <Button variant="outline" onClick={() => router.push("/")} className="w-full mt-4">
-          Voltar para a página inicial
+      <div className="flex flex-col items-center px-6 md:px-32 gap-4 pt-8">
+        <h1 className="text-3xl font-bold text-gray-800">Consultar Transações</h1>
+        <form onSubmit={(e) => { e.preventDefault(); handleSearch(); }} className="flex flex-col gap-4 mt-6 w-full max-w-lg">
+          <TextField
+            type="text"
+            label="Digite o ID da transação"
+            value={transactionId}
+            onChange={(e) => setTransactionId(e.target.value)}
+            fullWidth
+            variant="outlined"
+            className="bg-gray-50"
+          />
+          <Button type="submit" className="w-full mt-4 bg-red-500 text-white hover:bg-red-700 h-10 max-w-xs mx-auto">
+            Consultar Transação
+          </Button>
+        </form>
+        <Button onClick={() => router.push("/dashboard")} className="w-full mt-2 bg-gray-400 text-white hover:bg-gray-400 h-10 max-w-xs mx-auto">
+          Voltar para a Dashboard
         </Button>
       </div>
     </div>
