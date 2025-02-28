@@ -24,28 +24,31 @@ export default function AddMedication() {
   return (
     <div>
       <Header />
-      <div className="flex flex-col px-32 gap-4 pt-8">
-        <h1 className="text-3xl font-bold">Adicionar Medicamento</h1>
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4 mt-6">
+      <div className="flex flex-col items-center px-6 md:px-32 gap-4 pt-8">
+        <h1 className="text-3xl font-bold text-gray-800">Adicionar Medicamento</h1>
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4 mt-6 w-full max-w-lg">
           <Input
             type="text"
             placeholder="Nome do Medicamento"
             value={medicationName}
             onChange={(e) => setMedicationName(e.target.value)}
             required
+            className="bg-gray-50"
           />
           <Textarea
             placeholder="Descrição do Medicamento"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             required
+            className="bg-gray-50"
           />
           <Input
             type="text"
-            placeholder="Dose recomendada"
+            placeholder="Dosagem"
             value={dose}
             onChange={(e) => setDose(e.target.value)}
             required
+            className="bg-gray-50"
           />
           <Input
             type="number"
@@ -53,12 +56,13 @@ export default function AddMedication() {
             value={price}
             onChange={(e) => setPrice(e.target.value)}
             required
+            className="bg-gray-50"
           />
-          <Button type="submit" variant="outline" className="w-full mt-4">
+          <Button type="submit" className="w-full mt-4 bg-blue-600 text-white hover:bg-blue-700">
             Adicionar Medicamento
           </Button>
         </form>
-        <Button variant="outline" onClick={() => router.push("/")} className="w-full mt-4">
+        <Button onClick={() => router.push("/dashboard")} className="w-full mt-4 bg-gray-300 text-white hover:bg-gray-400">
           Voltar para a página inicial
         </Button>
       </div>
