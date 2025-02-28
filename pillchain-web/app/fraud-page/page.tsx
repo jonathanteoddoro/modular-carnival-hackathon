@@ -6,21 +6,25 @@ import { Input } from "@/components/ui/input";
 import { FileText, Search, ShieldAlert, ArrowLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
-import { Badge } from "@/components/ui/badge";
 
-interface Fraud {
+interface DetectedFraud {
   id: number;
-  pharmacyName: string;
-  description: string;
-  status: string;
-  severity: string;
-  reportedDate: string;
+  pharmacyWallet: string;
+  medicineName: string;
+  detectedAt: string;
+  createdAt: string;
+}
+
+// Extended interface for display purposes
+interface DisplayFraud extends DetectedFraud {
+  pharmacyName: string; // Will be derived from pharmacyWallet
+  reportedDate: string; // Will be based on detectedAt
 }
 
 export default function Fraude() {
   const router = useRouter();
   const [searchTerm, setSearchTerm] = useState("");
-  const [frauds, setFrauds] = useState<Fraud[]>([]);
+  const [frauds, setFrauds] = useState<DisplayFraud[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -28,8 +32,16 @@ export default function Fraude() {
       try {
         const response = await fetch('/api/frauds');
         if (!response.ok) throw new Error('Failed to fetch fraud data');
-        const data = await response.json();
-        setFrauds(data);
+        const data: DetectedFraud[] = await response.json();
+        
+        // Transform the data to match the expected interface
+        const transformedData: DisplayFraud[] = data.map(fraud => ({
+          ...fraud,
+          pharmacyName: `Farmácia ${fraud.pharmacyWallet.substring(0, 8)}...`, // Format pharmacy name from wallet
+          reportedDate: fraud.detectedAt,
+        }));
+        
+        setFrauds(transformedData);
       } catch (error) {
         console.error('Error fetching fraud data:', error);
       } finally {
@@ -42,17 +54,9 @@ export default function Fraude() {
 
   const filteredFrauds = frauds.filter(
     (fraud) =>
-      fraud.pharmacyName.toLowerCase().includes(searchTerm.toLowerCase())
+      fraud.pharmacyName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      fraud.medicineName.toLowerCase().includes(searchTerm.toLowerCase())
   );
-
-  const getSeverityColor = (severity: string) => {
-    switch (severity.toUpperCase()) {
-      case 'HIGH': return 'bg-red-100 text-red-800';
-      case 'MEDIUM': return 'bg-yellow-100 text-yellow-800';
-      case 'LOW': return 'bg-blue-100 text-blue-800';
-      default: return 'bg-gray-100 text-gray-800';
-    }
-  };
 
   return (
     <div className="min-h-screen bg-gray-50 ">
@@ -70,7 +74,7 @@ export default function Fraude() {
             <div className="relative w-full md:w-64">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
               <Input
-                placeholder="Buscar farmácia..."
+                placeholder="Buscar farmácia ou medicamento..."
                 className="pl-10 bg-white border-gray-200"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
@@ -91,7 +95,7 @@ export default function Fraude() {
           <div className="p-4 bg-white border-b border-gray-200">
             <h2 className="text-lg font-semibold text-gray-800 flex items-center">
               <ShieldAlert className="h-5 w-5 text-red-500 mr-2" />
-              Lista de Farmácias Suspeitas
+              Lista de Fraudes Detectadas
             </h2>
           </div>
           <div className="overflow-x-auto">
@@ -99,16 +103,13 @@ export default function Fraude() {
               <thead>
                 <tr className="bg-gray-50">
                   <th className="text-left p-4 text-sm font-medium text-gray-600 uppercase tracking-wider">
-                    Nome
+                    Farmácia
                   </th>
                   <th className="text-left p-4 text-sm font-medium text-gray-600 uppercase tracking-wider">
-                    Severidade
+                    Medicamento
                   </th>
                   <th className="text-left p-4 text-sm font-medium text-gray-600 uppercase tracking-wider">
-                    Status
-                  </th>
-                  <th className="text-left p-4 text-sm font-medium text-gray-600 uppercase tracking-wider">
-                    Data Reportada
+                    Data Detectada
                   </th>
                   <th className="text-center p-4 text-sm font-medium text-gray-600 uppercase tracking-wider">
                     Ações
@@ -118,7 +119,7 @@ export default function Fraude() {
               <tbody className="divide-y divide-gray-200">
                 {loading ? (
                   <tr>
-                    <td colSpan={5} className="p-8 text-center text-gray-500">
+                    <td colSpan={4} className="p-8 text-center text-gray-500">
                       Carregando dados...
                     </td>
                   </tr>
@@ -131,16 +132,11 @@ export default function Fraude() {
                       <td className="p-4 text-gray-900 font-medium">
                         {fraud.pharmacyName}
                       </td>
-                      <td className="p-4">
-                        <Badge className={getSeverityColor(fraud.severity)}>
-                          {fraud.severity}
-                        </Badge>
+                      <td className="p-4 text-gray-900">
+                        {fraud.medicineName}
                       </td>
                       <td className="p-4 text-gray-900">
-                        {fraud.status}
-                      </td>
-                      <td className="p-4 text-gray-900">
-                        {new Date(fraud.reportedDate).toLocaleDateString()}
+                        {new Date(fraud.detectedAt).toLocaleDateString()}
                       </td>
                       <td className="p-4">
                         <div className="flex justify-center gap-2">
@@ -168,8 +164,8 @@ export default function Fraude() {
                   ))
                 ) : (
                   <tr>
-                    <td colSpan={5} className="p-8 text-center text-gray-500">
-                      Nenhuma farmácia encontrada com os critérios de busca.
+                    <td colSpan={4} className="p-8 text-center text-gray-500">
+                      Nenhuma fraude encontrada com os critérios de busca.
                     </td>
                   </tr>
                 )}
@@ -177,8 +173,8 @@ export default function Fraude() {
             </table>
           </div>
           <div className="bg-gray-50 px-4 py-3 border-t border-gray-200 text-sm text-gray-500">
-            Mostrando {filteredFrauds.length} de {frauds.length} farmácias
-            suspeitas
+            Mostrando {filteredFrauds.length} de {frauds.length} fraudes
+            detectadas
           </div>
         </Card>
       </div>

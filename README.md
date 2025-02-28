@@ -16,9 +16,11 @@
 
 Pill Chain é a revolução no controle de medicamentos controlados: blockchain, segurança e rastreabilidade para impedir fraudes, garantir conformidade e proteger a saúde pública com transparência total.
 
-[**Link para o vídeo**]()
+[**Link para o vídeo demonstração**](https://drive.google.com/file/d/1T8GDYppexEvwawb0Mi4xngtactPaFbXN/view?usp=sharing)
 
-[**Link para os slides**](https://www.canva.com/design/DAGgVZlAhGA/NhUfESUUlYhdCbfl91FsyA/edit?utm_content=DAGgVZlAhGA&utm_campaign=designshare&utm_medium=link2&utm_source=sharebutton)
+[**Link para o pitch**]()
+
+[**Link para os slides**](https://www.canva.com/design/DAGgZDcZcUI/4hv_4K-nVOxZSgJU2EWO1w/edit?utm_content=DAGgZDcZcUI&utm_campaign=designshare&utm_medium=link2&utm_source=sharebutton)
 
 # Sumário
 - [1. Introdução](#1-introdução)
@@ -193,7 +195,36 @@ Com essa solução, tanto médicos quanto farmacêuticos ganham um fluxo de trab
 
 ## 3.3 Detalhamento da solução e tecnologias
 
-***"E como vocês pretendem tornar isso sustentável?"***
+**Pill Chain** é uma solução integrada para o controle e rastreabilidade de medicamentos controlados, combinando tecnologias de blockchain com aplicações web e mobile, e planejando a integração futura de machine learning para análises preditivas e otimização de processos.
+
+### Principais Componentes
+
+- **Desenvolvimento de Sistemas:**
+  - **Web:**  
+    Desenvolvida com React, a interface web se comunica com um backend em FastAPI via HTTP REST. Inclui integração com MetaMask para interagir com a blockchain.
+  - **Mobile:**  
+    Aplicativo construído em React Native que permite operações de consulta e transações diretamente com o backend.
+  - **Funcionalidades:**  
+    - **Interface do Fabricante:** Permite a criação (minting) de tokens que representam medicamentos, enviando-os diretamente para a carteira da farmácia.
+    - **Interface do Médico:** Possibilita a emissão de prescrições digitais, associando um medicamento específico à wallet de um paciente.
+    - **Interface da Farmácia:** Facilita a consulta dos tokens de medicamentos, valida prescrições e efetua a transferência dos tokens ao paciente.
+
+- **Blockchain:**
+  - **Tokenização e Rastreamento:**  
+    Cada medicamento é convertido em um NFT com informações detalhadas, como nome, lote e data de expiração. A imutabilidade dos registros na blockchain garante a transparência e integridade das transações.
+  - **Smart Contract (MedicineTracker):**  
+    Gerencia as operações de minting, emissão de prescrições e venda de medicamentos, utilizando um sistema de roles (MANUFACTURER_ROLE, DOCTOR_ROLE, PHARMACY_ROLE) para controle de acesso.
+  - **Fluxo de Transação:**  
+    1. **Minting:** O fabricante cria tokens e os envia para a carteira da farmácia.
+    2. **Emissão de Prescrição:** O médico emite uma prescrição digital vinculada ao nome do medicamento e à wallet do paciente.
+    3. **Validação e Venda:** A farmácia valida a prescrição e transfere o token para o paciente, marcando o medicamento como vendido.
+  - **Integração com Redes de Teste:**  
+    Utiliza a MetaMask e a rede Scroll, que oferece alta performance e segurança com baixa latência e custos reduzidos.
+
+- **Machine Learning:**
+  - Integração de modelo preditivo de classificação (Random Forest) que auxilia na identificação de padrões de fraude, otimização do fluxo de prescrições e melhoria contínua da gestão dos medicamentos.
+
+Esta abordagem modular garante uma gestão segura, transparente e eficiente dos medicamentos controlados, permitindo evolução e integração de novas tecnologias conforme o projeto avança.
 
 # 4. Mercado e modelo de negócios
 
