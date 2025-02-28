@@ -3,7 +3,8 @@ import Header from "@/components/Header"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
-import { FileText, Search, ShieldAlert } from "lucide-react"
+import { FileText, Search, ShieldAlert, ArrowLeft } from "lucide-react"
+import { useRouter } from "next/navigation"
 import { useState } from "react"
 
 const farmacias = [
@@ -15,6 +16,7 @@ const farmacias = [
 ]
 
 export default function Fraude() {
+  const router = useRouter()
   const [searchTerm, setSearchTerm] = useState("")
 
   const filteredFarmacias = farmacias.filter(
@@ -34,14 +36,20 @@ export default function Fraude() {
               Farmácias <span className="text-red-600">suspeitas de fraude</span>
             </h1>
           </div>
-          <div className="relative w-full md:w-64">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-            <Input
-              placeholder="Buscar farmácia..."
-              className="pl-10 bg-white border-gray-200"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
+          <div className="flex items-center gap-4">
+            <div className="relative w-full md:w-64">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+              <Input
+                placeholder="Buscar farmácia..."
+                className="pl-10 bg-white border-gray-200"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </div>
+            <Button variant="outline" onClick={() => router.push("/dashboard")} className="flex items-center">
+              <ArrowLeft className="h-4 w-4 mr-1" />
+              Voltar para a Dashboard
+            </Button>
           </div>
         </div>
 
@@ -49,7 +57,7 @@ export default function Fraude() {
           <div className="p-4 bg-white border-b border-gray-200">
             <h2 className="text-lg font-semibold text-gray-800 flex items-center">
               <ShieldAlert className="h-5 w-5 text-red-500 mr-2" />
-              Lista de Farmácias Suspeitas ({filteredFarmacias.length})
+              Lista de Farmácias Suspeitas 
             </h2>
           </div>
           <div className="overflow-x-auto">
