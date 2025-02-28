@@ -34,6 +34,7 @@ Pill Chain é a revolução no controle de medicamentos controlados: blockchain,
 - [6. Planos Futuros](#6-planos-futuros)
 - [7. Equipe](#7-equipe)
 - [8. Referências](#8-referências)
+- [9. Guia de Instalação](#9-guia-de-instalação)
 
 ---
 
@@ -213,7 +214,8 @@ Com essa solução, tanto médicos quanto farmacêuticos ganham um fluxo de trab
   - **Tokenização e Rastreamento:**  
     Cada medicamento é convertido em um NFT com informações detalhadas, como nome, lote e data de expiração. A imutabilidade dos registros na blockchain garante a transparência e integridade das transações.
   - **Smart Contract (MedicineTracker):**  
-    Gerencia as operações de minting, emissão de prescrições e venda de medicamentos, utilizando um sistema de roles (MANUFACTURER_ROLE, DOCTOR_ROLE, PHARMACY_ROLE) para controle de acesso.
+    Gerencia as operações de minting, emissão de prescrições e venda de medicamentos, utilizando um sistema de roles (MANUFACTURER_ROLE, DOCTOR_ROLE, PHARMACY_ROLE) para controle de acesso. [Link do Contrato](https://sepolia.scrollscan.com/address/0x25b594824a71a093beaCC5Cc786281d4441912e5).
+
   - **Fluxo de Transação:**  
     1. **Minting:** O fabricante cria tokens e os envia para a carteira da farmácia.
     2. **Emissão de Prescrição:** O médico emite uma prescrição digital vinculada ao nome do medicamento e à wallet do paciente.
@@ -317,9 +319,123 @@ O Pill Chain seguirá evoluindo para ampliar sua eficiência e alcance, incorpor
 2. Expansão Internacional:
     - Adaptação do sistema para atender regulamentações de outros países da América Latina, ampliando sua adoção e impacto na rastreabilidade farmacêutica.
 
+# 7. Guia de Instalação
+
+Este guia vai ajudar você a configurar e rodar o projeto PillChain em seu ambiente de desenvolvimento.
+
+### Pré-requisitos
+
+Antes de começar, certifique-se de ter instalado:
+
+- Node.js (v16.x ou superior)
+- NPM (v8.x ou superior) ou Yarn (v1.22.x ou superior)
+- Python (v3.8 ou superior) para o serviço de Machine Learning
+- Git
+
+### 1. Clone o repositório
+
+```bash
+git clone https://github.com/jonathanteoddoro/modular-carnival-hackathon.git
+cd modular-carnival-hackathon
+```
+
+### 2. Configuração da aplicação Web (Next.js)
+
+1. Navegue para o diretório da aplicação web:
+
+```bash
+cd pillchain-web
+```
+
+2. Instale as dependências:
+
+```bash
+npm install
+# ou
+yarn install
+```
+
+3. Configure o arquivo .env:
+
+```bash
+cp .env.example .env.local
+# Edite o arquivo .env.local com suas configurações
+```
+
+4. Execute as migrações do banco de dados:
+
+```bash
+npx prisma migrate dev
+```
+
+5. Inicie o servidor de desenvolvimento:
+
+```bash
+npm run dev
+# ou
+yarn dev
+```
+
+A aplicação web estará disponível em `http://localhost:3000`.
+
+### 3. Configuração do serviço de Machine Learning
+
+1. Navegue para o diretório de machine learning:
+
+```bash
+cd machine-learning
+```
+
+2. Crie e ative um ambiente virtual:
+
+```bash
+python -m venv venv
+
+# No Windows
+venv\Scripts\activate
+
+# No Linux/macOS
+source venv/bin/activate
+```
+
+3. Instale as dependências:
+
+```bash
+pip install -r requirements.txt
+```
+
+4. Execute o serviço:
+
+```bash
+uvicorn app:app --reload
+```
+
+O serviço de ML estará disponível em `http://localhost:8000`.
+
+### Solução de Problemas
+
+**Problema**: Erro ao executar as migrações do Prisma
+**Solução**: Verifique se o arquivo do banco de dados existe e se você tem permissões de escrita no diretório.
+
+**Problema**: Erro no serviço de Machine Learning
+**Solução**: Certifique-se de que todas as dependências foram instaladas corretamente e que o Python está na versão correta.
+
+**Problema**: Erro ao conectar com a blockchain
+**Solução**: Verifique se a rede no MetaMask está configurada corretamente e se os contratos foram implantados.
+
+### Recursos Adicionais
+
+- [Documentação do Next.js](https://nextjs.org/docs)
+- [Documentação do Prisma](https://www.prisma.io/docs)
+- [Documentação do FastAPI](https://fastapi.tiangolo.com)
+
+---
+
+Para mais informações, entre em contato com a equipe de desenvolvimento.
+
 ***"Me convenceu. E quem está por trás disso?"***
 
-# 7. Equipe 
+# 8. Equipe 
 
 | [![Gabriel Scarpelin](/assets/gabriel.jpg)](https://www.linkedin.com/in/gabriel-scarpelin-diniz-425258144/) | [![Jonathan Alves](/assets/jonathan.jpg)](https://www.linkedin.com/in/jonathanteoalves/) | [![Thiago Volcati](/assets/thiago.jpg)](https://www.linkedin.com/in/thiagovolcati/) | [![Davi Abreu](/assets/davi.jpg)](https://www.linkedin.com/in/davi-abreu-da-silveira/) |
 |:------------------------------------------------------:|:------------------------------------------------------:|:------------------------------------------------------:|:------------------------------------------------------:|
@@ -327,7 +443,7 @@ O Pill Chain seguirá evoluindo para ampliar sua eficiência e alcance, incorpor
 
 <br>
 
-# 8. Referências
+# 9. Referências
 
 STARTUS INSIGHTS. 5 Top Blockchain Startups Out Of 300 In Healthcare. Disponível em: <https://www.startus-insights.com/innovators-guide/5-top-blockchain-startups-out-of-300-in-healthcare/>. Acesso em: 27 fev. 2025.
 
@@ -339,8 +455,3 @@ Detailed Study Shows ROI and Savings from RFID Implementation. Disponível em: <
 
 ‌ETCO. Health: Drug Piracy Sets Record in Brazil - ETCO. Disponível em: <https://en.etco.org.br/etco-na-midia/saude-pirataria-de-medicamentos-bate-recorde-no-brasil/>. Acesso em: 27 fev. 2025.
 
-‌
-
-‌
-
-‌
