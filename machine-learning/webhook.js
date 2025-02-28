@@ -1,16 +1,9 @@
-"use client"
-import { useState } from "react"
-import Header from "@/components/Header"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { useRouter } from "next/navigation"
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
-import { AlertCircle, Loader2, ArrowLeft, InfoIcon } from "lucide-react"
-import { ethers } from "ethers"
+const { ethers } = require("ethers");
+const fs = require("fs");
 
-// ABI only containing the medicine information getter functions
+const RPC_URL = "https://sepolia-rpc.scroll.io";  
+const CONTRACT_ADDRESS = "0x25b594824a71a093beaCC5Cc786281d4441912e5";
+
 const CONTRACT_ABI = [
 	{
 		"inputs": [],
@@ -914,182 +907,49 @@ const CONTRACT_ABI = [
 		"stateMutability": "view",
 		"type": "function"
 	}
-]
+];
 
-const CONTRACT_ADDRESS = "0x25b594824a71a093beaCC5Cc786281d4441912e5"
+const provider = new ethers.JsonRpcProvider(RPC_URL);
+const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, provider);
 
-interface MedicineInfo {
-  name: string
-  batchNumber: string
-  expirationDate: bigint
-  isSold: boolean
-  owner: string
+const DATA_FILE = "medicine_purchases.json";
+
+function loadData() {
+    if (fs.existsSync(DATA_FILE)) {
+        return JSON.parse(fs.readFileSync(DATA_FILE));
+    }
+    return {};
 }
 
-export default function ConsultMedication() {
-  const router = useRouter()
-  const [tokenId, setTokenId] = useState("")
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState("")
-  const [medicineInfo, setMedicineInfo] = useState<MedicineInfo | null>(null)
-
-  const handleSearch = async (e: React.FormEvent) => {
-    e.preventDefault()
-    
-    if (!tokenId) {
-      setError("Por favor, digite um ID de medicamento")
-      return
-    }
-
-    try {
-      setLoading(true)
-      setError("")
-      setMedicineInfo(null)
-
-      // Connect to Ethereum network
-      if (!window.ethereum) {
-        setError("Por favor, instale a MetaMask ou outro provedor Ethereum")
-        return
-      }
-
-      const provider = new ethers.BrowserProvider(window.ethereum)
-      const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, provider)
-
-      // Get medicine information and owner
-      const id = parseInt(tokenId)
-      const [medicineData, owner] = await Promise.all([
-        contract.medicines(id),
-        contract.ownerOf(id).catch(() => "Não encontrado")
-      ])
-      
-      setMedicineInfo({
-        name: medicineData[0],
-        batchNumber: medicineData[1],
-        expirationDate: medicineData[2], // Store as original BigInt
-        isSold: medicineData[3],
-        owner: owner
-      })
-    } catch (error: any) {
-      console.error("Erro ao consultar medicamento:", error)
-      
-      if (error.message?.includes("ERC721NonexistentToken")) {
-        setError("Medicamento não encontrado: ID inexistente")
-      } else if (error.message?.includes("call revert exception")) {
-        setError("Erro ao acessar informações do contrato. Verifique o ID do medicamento.")
-      } else {
-        setError(`Erro ao consultar medicamento: ${error.message || "Erro desconhecido"}`)
-      }
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  // Format date from BigInt UNIX timestamp
-  const formatDate = (timestamp: bigint) => {
-    // Safely convert BigInt to number for Date constructor
-    const timestampNum = Number(timestamp)
-    const date = new Date(timestampNum * 1000)
-    return date.toLocaleDateString('pt-BR')
-  }
-
-  // Check if medicine is expired
-  const isExpired = (timestamp: bigint) => {
-    const now = Date.now() / 1000 // Current time in seconds
-    return now > Number(timestamp)
-  }
-
-  return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
-      <Header />
-      <main className="flex-1 container mx-auto px-4 py-8">
-        <Card className="w-full max-w-lg mx-auto">
-          <CardHeader>
-            <CardTitle className="text-2xl font-bold text-center">Consultar Medicamento</CardTitle>
-            <CardDescription className="text-center">
-              Digite o ID do medicamento para consultar suas informações
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            {error && (
-              <Alert className="mb-6 bg-red-50 text-red-900">
-                <AlertCircle className="h-4 w-4" />
-                <AlertTitle>Erro</AlertTitle>
-                <AlertDescription>{error}</AlertDescription>
-              </Alert>
-            )}
-
-            <form className="space-y-4" onSubmit={handleSearch}>
-              <div className="space-y-2">
-                <Label htmlFor="tokenId">ID do Medicamento</Label>
-                <Input
-                  id="tokenId"
-                  type="number"
-                  placeholder="Digite o ID do medicamento"
-                  value={tokenId}
-                  onChange={(e) => setTokenId(e.target.value)}
-                  className="h-12"
-                  required
-                />
-              </div>
-
-              <Button type="submit" className="w-full h-12 bg-[#D5A021]" disabled={loading}>
-                {loading ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Consultando...
-                  </>
-                ) : (
-                  "Consultar Medicamento"
-                )}
-              </Button>
-            </form>
-
-            {medicineInfo && (
-              <div className="mt-6 space-y-4">
-                <h3 className="text-xl font-semibold">Informações do Medicamento</h3>
-                <div className="p-4 bg-gray-100 rounded-md space-y-3">
-                  <div>
-                    <p className="text-sm font-medium text-gray-600">Nome:</p>
-                    <p className="text-lg">{medicineInfo.name}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-gray-600">Número do Lote:</p>
-                    <p>{medicineInfo.batchNumber}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-gray-600">Data de Validade:</p>
-                    <p className={`${isExpired(medicineInfo.expirationDate) ? 'text-red-600 font-bold' : ''}`}>
-                      {formatDate(medicineInfo.expirationDate)}
-                      {isExpired(medicineInfo.expirationDate) && ' (EXPIRADO)'}
-                    </p>
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-gray-600">Status:</p>
-                    <p className={`font-medium ${medicineInfo.isSold ? 'text-blue-600' : 'text-green-600'}`}>
-                      {medicineInfo.isSold ? 'Vendido' : 'Disponível'}
-                    </p>
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-gray-600">Proprietário Atual:</p>
-                    <p className="text-xs font-mono break-all">{medicineInfo.owner}</p>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            <div className="mt-6">
-              <Button
-                variant="outline"
-                className="w-full"
-                onClick={() => router.push("/dashboard")}
-              >
-                <ArrowLeft className="mr-2 h-4 w-4" />
-                Voltar para Dashboard
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      </main>
-    </div>
-  )
+function saveData(data) {
+    fs.writeFileSync(DATA_FILE, JSON.stringify(data, null, 2));
 }
+
+console.log("📡 Monitorando compras de medicamentos na Scroll...");
+
+contract.on("MedicineMinted", (tokenId, name, batchNumber, manufacturer, pharmacy, event) => {
+    const today = new Date().toISOString().split("T")[0]; 
+    let data = loadData();
+
+    if (!data[today]) {
+        data[today] = {};
+    }
+
+    if (!data[today][pharmacy]) {
+        data[today][pharmacy] = { total_mintados: 0 };
+    }
+
+    data[today][pharmacy].total_mintados += 1; 
+    saveData(data);
+
+    console.log(`
+    ✅ COMPRA REGISTRADA (${today}) ✅
+    --------------------------------
+    🏪 Farmácia: ${pharmacy}
+    📌 Nome: ${name}
+    🔢 Token ID: ${tokenId}
+    🏭 Fabricante: ${manufacturer}
+    📍 Tx Hash: ${event.transactionHash}
+    --------------------------------
+    `);
+});
