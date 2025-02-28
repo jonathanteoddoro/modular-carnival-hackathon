@@ -1,0 +1,40 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model SalesHistory {
+  id              Int      @id @default(autoincrement())
+  pharmacyWallet  String
+  medicineName    String
+  transactionDate DateTime @default(now())
+  customerWallet  String
+  medicineId      Int
+  transactionHash String
+  createdAt       DateTime @default(now())
+
+  @@index([pharmacyWallet])
+  @@index([customerWallet])
+  @@index([medicineId])
+}
+
+model SupplyHistory {
+  id              Int      @id @default(autoincrement())
+  medicineName    String
+  batchNumber     String
+  expirationDate  DateTime
+  pharmacyWallet  String
+  supplierWallet  String
+  quantity        Int
+  transactionHash String
+  transactionDate DateTime @default(now())
+  createdAt       DateTime @default(now())
+
+  @@index([pharmacyWallet])
+  @@index([supplierWallet])
+  @@index([batchNumber])
+}

@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
+import { toast } from "react-hot-toast"
 
 // Extend the Window interface to include the ethereum property
 declare global {
@@ -24,207 +25,10 @@ const contractAddress = "0x25b594824a71a093beaCC5Cc786281d4441912e5"
 // ABI mínimo necessário para chamar batchMintMedicine
 const contractABI = [
   {
-    inputs: [],
-    stateMutability: "nonpayable",
-    type: "constructor",
-  },
-  {
-    inputs: [],
-    name: "AccessControlBadConfirmation",
-    type: "error",
-  },
-  {
-    inputs: [
-      {
-        internalType: "address",
-        name: "account",
-        type: "address",
-      },
-      {
-        internalType: "bytes32",
-        name: "neededRole",
-        type: "bytes32",
-      },
-    ],
-    name: "AccessControlUnauthorizedAccount",
-    type: "error",
-  },
-  {
-    inputs: [
-      {
-        internalType: "address",
-        name: "sender",
-        type: "address",
-      },
-      {
-        internalType: "uint256",
-        name: "tokenId",
-        type: "uint256",
-      },
-      {
-        internalType: "address",
-        name: "owner",
-        type: "address",
-      },
-    ],
-    name: "ERC721IncorrectOwner",
-    type: "error",
-  },
-  {
-    inputs: [
-      {
-        internalType: "address",
-        name: "operator",
-        type: "address",
-      },
-      {
-        internalType: "uint256",
-        name: "tokenId",
-        type: "uint256",
-      },
-    ],
-    name: "ERC721InsufficientApproval",
-    type: "error",
-  },
-  {
-    inputs: [
-      {
-        internalType: "address",
-        name: "approver",
-        type: "address",
-      },
-    ],
-    name: "ERC721InvalidApprover",
-    type: "error",
-  },
-  {
-    inputs: [
-      {
-        internalType: "address",
-        name: "operator",
-        type: "address",
-      },
-    ],
-    name: "ERC721InvalidOperator",
-    type: "error",
-  },
-  {
-    inputs: [
-      {
-        internalType: "address",
-        name: "owner",
-        type: "address",
-      },
-    ],
-    name: "ERC721InvalidOwner",
-    type: "error",
-  },
-  {
-    inputs: [
-      {
-        internalType: "address",
-        name: "receiver",
-        type: "address",
-      },
-    ],
-    name: "ERC721InvalidReceiver",
-    type: "error",
-  },
-  {
-    inputs: [
-      {
-        internalType: "address",
-        name: "sender",
-        type: "address",
-      },
-    ],
-    name: "ERC721InvalidSender",
-    type: "error",
-  },
-  {
-    inputs: [
-      {
-        internalType: "uint256",
-        name: "tokenId",
-        type: "uint256",
-      },
-    ],
-    name: "ERC721NonexistentToken",
-    type: "error",
-  },
-  {
-    anonymous: false,
-    inputs: [
-      {
-        indexed: true,
-        internalType: "address",
-        name: "owner",
-        type: "address",
-      },
-      {
-        indexed: true,
-        internalType: "address",
-        name: "approved",
-        type: "address",
-      },
-      {
-        indexed: true,
-        internalType: "uint256",
-        name: "tokenId",
-        type: "uint256",
-      },
-    ],
-    name: "Approval",
-    type: "event",
-  },
-  {
-    anonymous: false,
-    inputs: [
-      {
-        indexed: true,
-        internalType: "address",
-        name: "owner",
-        type: "address",
-      },
-      {
-        indexed: true,
-        internalType: "address",
-        name: "operator",
-        type: "address",
-      },
-      {
-        indexed: false,
-        internalType: "bool",
-        name: "approved",
-        type: "bool",
-      },
-    ],
-    name: "ApprovalForAll",
-    type: "event",
-  },
-  {
-    inputs: [
-      {
-        internalType: "address",
-        name: "to",
-        type: "address",
-      },
-      {
-        internalType: "uint256",
-        name: "tokenId",
-        type: "uint256",
-      },
-    ],
-    name: "approve",
-    outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
     inputs: [
       {
         internalType: "string",
-        name: "_name",
+        name: "_medicineName",
         type: "string",
       },
       {
@@ -253,678 +57,6 @@ const contractABI = [
     stateMutability: "nonpayable",
     type: "function",
   },
-  {
-    inputs: [
-      {
-        internalType: "bytes32",
-        name: "role",
-        type: "bytes32",
-      },
-      {
-        internalType: "address",
-        name: "account",
-        type: "address",
-      },
-    ],
-    name: "grantRole",
-    outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    inputs: [
-      {
-        internalType: "string",
-        name: "_medicineName",
-        type: "string",
-      },
-      {
-        internalType: "address",
-        name: "_patient",
-        type: "address",
-      },
-    ],
-    name: "issuePrescription",
-    outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    anonymous: false,
-    inputs: [
-      {
-        indexed: true,
-        internalType: "uint256",
-        name: "tokenId",
-        type: "uint256",
-      },
-      {
-        indexed: false,
-        internalType: "string",
-        name: "name",
-        type: "string",
-      },
-      {
-        indexed: false,
-        internalType: "string",
-        name: "batchNumber",
-        type: "string",
-      },
-      {
-        indexed: true,
-        internalType: "address",
-        name: "manufacturer",
-        type: "address",
-      },
-      {
-        indexed: true,
-        internalType: "address",
-        name: "pharmacy",
-        type: "address",
-      },
-    ],
-    name: "MedicineMinted",
-    type: "event",
-  },
-  {
-    anonymous: false,
-    inputs: [
-      {
-        indexed: true,
-        internalType: "uint256",
-        name: "tokenId",
-        type: "uint256",
-      },
-      {
-        indexed: true,
-        internalType: "address",
-        name: "pharmacy",
-        type: "address",
-      },
-      {
-        indexed: true,
-        internalType: "address",
-        name: "patient",
-        type: "address",
-      },
-    ],
-    name: "MedicineSold",
-    type: "event",
-  },
-  {
-    anonymous: false,
-    inputs: [
-      {
-        indexed: false,
-        internalType: "string",
-        name: "medicineName",
-        type: "string",
-      },
-      {
-        indexed: true,
-        internalType: "address",
-        name: "doctor",
-        type: "address",
-      },
-      {
-        indexed: true,
-        internalType: "address",
-        name: "patient",
-        type: "address",
-      },
-    ],
-    name: "PrescriptionIssued",
-    type: "event",
-  },
-  {
-    inputs: [
-      {
-        internalType: "bytes32",
-        name: "role",
-        type: "bytes32",
-      },
-      {
-        internalType: "address",
-        name: "callerConfirmation",
-        type: "address",
-      },
-    ],
-    name: "renounceRole",
-    outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    inputs: [
-      {
-        internalType: "bytes32",
-        name: "role",
-        type: "bytes32",
-      },
-      {
-        internalType: "address",
-        name: "account",
-        type: "address",
-      },
-    ],
-    name: "revokeRole",
-    outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    anonymous: false,
-    inputs: [
-      {
-        indexed: true,
-        internalType: "bytes32",
-        name: "role",
-        type: "bytes32",
-      },
-      {
-        indexed: true,
-        internalType: "bytes32",
-        name: "previousAdminRole",
-        type: "bytes32",
-      },
-      {
-        indexed: true,
-        internalType: "bytes32",
-        name: "newAdminRole",
-        type: "bytes32",
-      },
-    ],
-    name: "RoleAdminChanged",
-    type: "event",
-  },
-  {
-    anonymous: false,
-    inputs: [
-      {
-        indexed: true,
-        internalType: "bytes32",
-        name: "role",
-        type: "bytes32",
-      },
-      {
-        indexed: true,
-        internalType: "address",
-        name: "account",
-        type: "address",
-      },
-      {
-        indexed: true,
-        internalType: "address",
-        name: "sender",
-        type: "address",
-      },
-    ],
-    name: "RoleGranted",
-    type: "event",
-  },
-  {
-    anonymous: false,
-    inputs: [
-      {
-        indexed: true,
-        internalType: "bytes32",
-        name: "role",
-        type: "bytes32",
-      },
-      {
-        indexed: true,
-        internalType: "address",
-        name: "account",
-        type: "address",
-      },
-      {
-        indexed: true,
-        internalType: "address",
-        name: "sender",
-        type: "address",
-      },
-    ],
-    name: "RoleRevoked",
-    type: "event",
-  },
-  {
-    inputs: [
-      {
-        internalType: "address",
-        name: "from",
-        type: "address",
-      },
-      {
-        internalType: "address",
-        name: "to",
-        type: "address",
-      },
-      {
-        internalType: "uint256",
-        name: "tokenId",
-        type: "uint256",
-      },
-    ],
-    name: "safeTransferFrom",
-    outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    inputs: [
-      {
-        internalType: "address",
-        name: "from",
-        type: "address",
-      },
-      {
-        internalType: "address",
-        name: "to",
-        type: "address",
-      },
-      {
-        internalType: "uint256",
-        name: "tokenId",
-        type: "uint256",
-      },
-      {
-        internalType: "bytes",
-        name: "data",
-        type: "bytes",
-      },
-    ],
-    name: "safeTransferFrom",
-    outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    inputs: [
-      {
-        internalType: "uint256",
-        name: "_tokenId",
-        type: "uint256",
-      },
-      {
-        internalType: "address",
-        name: "_patient",
-        type: "address",
-      },
-    ],
-    name: "sellMedicine",
-    outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    inputs: [
-      {
-        internalType: "address",
-        name: "operator",
-        type: "address",
-      },
-      {
-        internalType: "bool",
-        name: "approved",
-        type: "bool",
-      },
-    ],
-    name: "setApprovalForAll",
-    outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    anonymous: false,
-    inputs: [
-      {
-        indexed: true,
-        internalType: "address",
-        name: "from",
-        type: "address",
-      },
-      {
-        indexed: true,
-        internalType: "address",
-        name: "to",
-        type: "address",
-      },
-      {
-        indexed: true,
-        internalType: "uint256",
-        name: "tokenId",
-        type: "uint256",
-      },
-    ],
-    name: "Transfer",
-    type: "event",
-  },
-  {
-    inputs: [
-      {
-        internalType: "address",
-        name: "from",
-        type: "address",
-      },
-      {
-        internalType: "address",
-        name: "to",
-        type: "address",
-      },
-      {
-        internalType: "uint256",
-        name: "tokenId",
-        type: "uint256",
-      },
-    ],
-    name: "transferFrom",
-    outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    inputs: [
-      {
-        internalType: "address",
-        name: "owner",
-        type: "address",
-      },
-    ],
-    name: "balanceOf",
-    outputs: [
-      {
-        internalType: "uint256",
-        name: "",
-        type: "uint256",
-      },
-    ],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [],
-    name: "DEFAULT_ADMIN_ROLE",
-    outputs: [
-      {
-        internalType: "bytes32",
-        name: "",
-        type: "bytes32",
-      },
-    ],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [],
-    name: "DOCTOR_ROLE",
-    outputs: [
-      {
-        internalType: "bytes32",
-        name: "",
-        type: "bytes32",
-      },
-    ],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [
-      {
-        internalType: "uint256",
-        name: "tokenId",
-        type: "uint256",
-      },
-    ],
-    name: "getApproved",
-    outputs: [
-      {
-        internalType: "address",
-        name: "",
-        type: "address",
-      },
-    ],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [
-      {
-        internalType: "bytes32",
-        name: "role",
-        type: "bytes32",
-      },
-    ],
-    name: "getRoleAdmin",
-    outputs: [
-      {
-        internalType: "bytes32",
-        name: "",
-        type: "bytes32",
-      },
-    ],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [
-      {
-        internalType: "bytes32",
-        name: "role",
-        type: "bytes32",
-      },
-      {
-        internalType: "address",
-        name: "account",
-        type: "address",
-      },
-    ],
-    name: "hasRole",
-    outputs: [
-      {
-        internalType: "bool",
-        name: "",
-        type: "bool",
-      },
-    ],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [
-      {
-        internalType: "address",
-        name: "owner",
-        type: "address",
-      },
-      {
-        internalType: "address",
-        name: "operator",
-        type: "address",
-      },
-    ],
-    name: "isApprovedForAll",
-    outputs: [
-      {
-        internalType: "bool",
-        name: "",
-        type: "bool",
-      },
-    ],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [],
-    name: "MANUFACTURER_ROLE",
-    outputs: [
-      {
-        internalType: "bytes32",
-        name: "",
-        type: "bytes32",
-      },
-    ],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [
-      {
-        internalType: "uint256",
-        name: "",
-        type: "uint256",
-      },
-    ],
-    name: "medicines",
-    outputs: [
-      {
-        internalType: "string",
-        name: "name",
-        type: "string",
-      },
-      {
-        internalType: "string",
-        name: "batchNumber",
-        type: "string",
-      },
-      {
-        internalType: "uint256",
-        name: "expirationDate",
-        type: "uint256",
-      },
-      {
-        internalType: "bool",
-        name: "isSold",
-        type: "bool",
-      },
-    ],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [],
-    name: "name",
-    outputs: [
-      {
-        internalType: "string",
-        name: "",
-        type: "string",
-      },
-    ],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [
-      {
-        internalType: "uint256",
-        name: "tokenId",
-        type: "uint256",
-      },
-    ],
-    name: "ownerOf",
-    outputs: [
-      {
-        internalType: "address",
-        name: "",
-        type: "address",
-      },
-    ],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [],
-    name: "PHARMACY_ROLE",
-    outputs: [
-      {
-        internalType: "bytes32",
-        name: "",
-        type: "bytes32",
-      },
-    ],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [
-      {
-        internalType: "address",
-        name: "",
-        type: "address",
-      },
-    ],
-    name: "prescriptions",
-    outputs: [
-      {
-        internalType: "address",
-        name: "patient",
-        type: "address",
-      },
-      {
-        internalType: "string",
-        name: "medicineName",
-        type: "string",
-      },
-      {
-        internalType: "bool",
-        name: "isValid",
-        type: "bool",
-      },
-    ],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [
-      {
-        internalType: "bytes4",
-        name: "interfaceId",
-        type: "bytes4",
-      },
-    ],
-    name: "supportsInterface",
-    outputs: [
-      {
-        internalType: "bool",
-        name: "",
-        type: "bool",
-      },
-    ],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [],
-    name: "symbol",
-    outputs: [
-      {
-        internalType: "string",
-        name: "",
-        type: "string",
-      },
-    ],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [
-      {
-        internalType: "uint256",
-        name: "tokenId",
-        type: "uint256",
-      },
-    ],
-    name: "tokenURI",
-    outputs: [
-      {
-        internalType: "string",
-        name: "",
-        type: "string",
-      },
-    ],
-    stateMutability: "view",
-    type: "function",
-  },
 ]
 
 export default function Supplier() {
@@ -936,13 +68,44 @@ export default function Supplier() {
   const [quantity, setQuantity] = useState("")
   const [status, setStatus] = useState({ type: "", message: "" })
   const [isLoading, setIsLoading] = useState(false)
+  const [txHash, setTxHash] = useState("")
 
   interface Status {
     type: string
     message: string
   }
 
-  interface FormEvent extends React.FormEvent<HTMLFormElement> {}
+  interface FormEvent extends React.FormEvent {}
+
+  // Função para salvar os dados de fornecimento no banco de dados
+  const saveSupplyToDatabase = async (data: {
+    medicineName: string;
+    batchNumber: string;
+    expirationDate: number;
+    pharmacyWallet: string;
+    supplierWallet: string;
+    quantity: number;
+    transactionHash: string;
+  }) => {
+    try {
+      const response = await fetch('/api/supplies', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      });
+      
+      if (!response.ok) {
+        throw new Error('Falha ao salvar dados do fornecimento no banco de dados');
+      }
+      
+      return await response.json();
+    } catch (error) {
+      console.error('Erro ao salvar no banco de dados:', error);
+      throw error;
+    }
+  };
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault()
@@ -971,16 +134,32 @@ export default function Supplier() {
       // Instanciar o provider corretamente para ethers v6
       const provider = new ethers.BrowserProvider(window.ethereum)
       const signer = await provider.getSigner()
+      const supplierWallet = await signer.getAddress()
 
       // Criar instância do contrato
       const contract = new ethers.Contract(contractAddress, contractABI, signer)
 
       // Chamar função batchMintMedicine
+      toast.loading("Processando transação...")
       const tx = await contract.batchMintMedicine(medicineName, batchNumber, expDate, pharmacyAddress, quantityNum)
+      setTxHash(tx.hash)
 
       // Esperar a transação ser confirmada
       await tx.wait()
+      toast.dismiss()
 
+      // Salvar os dados no banco de dados
+      await saveSupplyToDatabase({
+        medicineName,
+        batchNumber,
+        expirationDate: expDate,
+        pharmacyWallet: pharmacyAddress,
+        supplierWallet,
+        quantity: quantityNum,
+        transactionHash: tx.hash
+      })
+
+      toast.success("Fornecimento registrado com sucesso!")
       setStatus({
         type: "success",
         message: `Sucesso! ${quantity} unidades de ${medicineName} geradas para a farmácia.`,
@@ -994,6 +173,8 @@ export default function Supplier() {
       setQuantity("")
     } catch (error) {
       console.error("Transaction error:", error)
+      toast.dismiss()
+      toast.error("Erro na transação")
       setStatus({
         type: "error",
         message: `Erro: ${(error as any).message || "Falha na transação. Verifique se você tem o papel MANUFACTURER_ROLE."}`,
@@ -1007,7 +188,7 @@ export default function Supplier() {
     <div className="min-h-screen bg-gray-50 flex flex-col">
       <Header />
       <main className="flex-1 container mx-auto px-4 py-8">
-        <Card className="w-full max-w-2xl mx-auto">
+        <Card className="w-full max-w-lg mx-auto">
           <CardHeader>
             <CardTitle className="text-2xl font-bold text-center">Gerar venda para farmácia</CardTitle>
             <CardDescription className="text-center">
@@ -1029,56 +210,73 @@ export default function Supplier() {
               <div className="space-y-2">
                 <Label htmlFor="medicineName">Tipo do Remédio</Label>
                 <Input
-				className="h-12"
                   id="medicineName"
-                  placeholder="Digite o nome do medicamento"
+                  className="h-12"
+                  placeholder="Nome do medicamento"
                   value={medicineName}
                   onChange={(e) => setMedicineName(e.target.value)}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="batchNumber">N° Lote</Label>
-                <Input
-				className="h-12"
-                  id="batchNumber"
-                  placeholder="Digite o número do lote"
-                  value={batchNumber}
-                  onChange={(e) => setBatchNumber(e.target.value)}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="expirationDate">Data Validade</Label>
-                <Input
-				className="h-12"
-                  id="expirationDate"
-                  type="date"
-                  value={expirationDate}
-                  onChange={(e) => setExpirationDate(e.target.value)}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="pharmacyAddress">Farmácia Destino</Label>
-                <Input
-				className="h-12"
-                  id="pharmacyAddress"
-                  placeholder="0x..."
-                  value={pharmacyAddress}
-                  onChange={(e) => setPharmacyAddress(e.target.value)}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="quantity">Quantidade</Label>
-                <Input
-				className="h-12"
-                  id="quantity"
-                  type="number"
-                  placeholder="Digite a quantidade"
-                  value={quantity}
-                  onChange={(e) => setQuantity(e.target.value)}
+                  required
                 />
               </div>
 
-              <Button type="submit" className="w-full h-12 bg-[#D5A021] mt-2 hover:bg-[#D5A0FF]]" disabled={isLoading}>
+              <div className="space-y-2">
+                <Label htmlFor="batchNumber">N° Lote</Label>
+                <Input
+                  id="batchNumber"
+                  className="h-12"
+                  placeholder="Número do lote"
+                  value={batchNumber}
+                  onChange={(e) => setBatchNumber(e.target.value)}
+                  required
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="expirationDate">Data Validade</Label>
+                <Input
+                  id="expirationDate"
+                  className="h-12"
+                  type="date"
+                  value={expirationDate}
+                  onChange={(e) => setExpirationDate(e.target.value)}
+                  required
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="pharmacyAddress">Farmácia Destino</Label>
+                <Input
+                  id="pharmacyAddress"
+                  className="h-12"
+                  placeholder="0x..."
+                  value={pharmacyAddress}
+                  onChange={(e) => setPharmacyAddress(e.target.value)}
+                  required
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="quantity">Quantidade</Label>
+                <Input
+                  id="quantity"
+                  className="h-12"
+                  type="number"
+                  placeholder="Quantidade de unidades"
+                  min="1"
+                  value={quantity}
+                  onChange={(e) => setQuantity(e.target.value)}
+                  required
+                />
+              </div>
+
+              {txHash && (
+                <div className="mt-4 p-3 bg-gray-100 rounded-md">
+                  <p className="text-sm font-medium">Transação:</p>
+                  <p className="text-xs text-gray-600 break-all">{txHash}</p>
+                </div>
+              )}
+
+              <Button type="submit" className="w-full h-12 bg-[#D5A021]" disabled={isLoading}>
                 {isLoading ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -1098,4 +296,3 @@ export default function Supplier() {
     </div>
   )
 }
-
