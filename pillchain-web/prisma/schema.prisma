@@ -4,7 +4,78 @@ generator client {
 
 datasource db {
   provider = "sqlite"
-  url      = "file:./dev.db"
+  url      = "file:./db/pillchaindb.db"
+}
+
+model Client {
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String   @unique
+  cpf       String   @unique
+  password  String
+  wallet    String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Medicine {
+  id        Int      @id @default(autoincrement())
+  name      String
+  factory   String
+  lot       String   @unique
+  validity  DateTime
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Doctor {
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String   @unique
+  crm       String   @unique
+  password  String
+  document  String   @unique
+  wallet    String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Prescription {
+  id         Int    @id @default(autoincrement())
+  doctorId   Int
+  clientId   Int
+  identifier String @unique
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Pharmacy {
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String   @unique
+  cnpj      String   @unique
+  wallet    String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model PrescriptionMedicine {
+  id             Int      @id @default(autoincrement())
+  prescriptionId Int
+  medicineId     Int
+  indication     String
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model ClientQRCode {
+  id         Int      @id @default(autoincrement())
+  clientId   Int
+  qrCode     String
+  validUntil DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 }
 
 model SalesHistory {
