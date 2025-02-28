@@ -2,7 +2,7 @@
 "use client"
 import Header from "@/components/Header";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import TextField from "@mui/material/TextField";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
@@ -18,29 +18,24 @@ export default function ConsultMedication() {
   return (
     <div>
       <Header />
-      <div className="flex flex-col px-32 gap-4 pt-8">
-        <h1 className="text-3xl font-bold">Consultar Medicamento</h1>
-        <Input
-          type="text"
-          placeholder="Digite o nome do medicamento"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="mt-4"
-        />
-        <Button
-          variant="outline"
-          onClick={handleSearch}
-          className="w-full mt-4"
-        >
-          Consultar Medicamento
-        </Button>
-        <div className="mt-8">
-          {/* Placeholder para resultados de pesquisa */}
-          <p>Resultados para: {searchTerm}</p>
-          {/* Aqui você pode adicionar uma lista de medicamentos encontrados */}
-        </div>
-        <Button variant="outline" onClick={() => router.push("/")} className="w-full mt-4">
-          Voltar para a página inicial
+      <div className="flex flex-col items-center px-6 md:px-32 gap-4 pt-8">
+        <h1 className="text-3xl font-bold text-gray-800">Consultar Medicamento</h1>
+        <form onSubmit={(e) => { e.preventDefault(); handleSearch(); }} className="flex flex-col gap-4 mt-6 w-full max-w-lg">
+          <TextField
+            type="text"
+            label="Digite o nome do medicamento"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            fullWidth
+            variant="outlined"
+            className="bg-gray-50"
+          />
+          <Button type="submit" className="w-full mt-4 bg-red-500 text-white hover:bg-red-700 h-10 max-w-lg">
+            Consultar Medicamento
+          </Button>
+        </form>
+        <Button onClick={() => router.push("/dashboard")} className="w-full mt-2 bg-gray-400 text-white hover:bg-gray-400 h-10 max-w-lg">
+          Voltar para a Dashboard
         </Button>
       </div>
     </div>
